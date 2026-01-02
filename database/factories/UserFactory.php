@@ -50,6 +50,30 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user should not have two factor authentication enabled.
+     */
+    public function withoutTwoFactor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'two_factor_confirmed_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user should have two factor authentication enabled.
+     */
+    public function withTwoFactor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'two_factor_secret' => 'secret',
+            'two_factor_recovery_codes' => 'recovery-codes',
+            'two_factor_confirmed_at' => now(),
+        ]);
+    }
+
+    /**
      * Indicate that the user should have a personal team.
      */
     public function withPersonalTeam(?callable $callback = null): static
