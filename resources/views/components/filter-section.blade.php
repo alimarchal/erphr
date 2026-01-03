@@ -27,6 +27,7 @@
         const btn = document.getElementById("toggle");
 
         function showFilters() {
+            if (!targetDiv) return;
             targetDiv.style.display = 'block';
             targetDiv.style.opacity = '0';
             targetDiv.style.transform = 'translateY(-20px)';
@@ -37,33 +38,38 @@
         }
 
         function hideFilters() {
+            if (!targetDiv) return;
             targetDiv.style.opacity = '0';
             targetDiv.style.transform = 'translateY(-20px)';
             setTimeout(() => {
                 targetDiv.style.display = 'none';
             }, 300);
-         }
+        }
 
-        btn.onclick = function(event) {
-            event.stopPropagation();
-            if (targetDiv.style.display === "none") {
-                showFilters();
-            } else {
-                hideFilters();
-            }
-        };
+        if (btn) {
+            btn.onclick = function(event) {
+                event.stopPropagation();
+                if (targetDiv.style.display === "none") {
+                    showFilters();
+                } else {
+                    hideFilters();
+                }
+            };
+        }
 
         // Hide filters when clicking outside
         document.addEventListener('click', function(event) {
-            if (targetDiv.style.display === 'block' && !targetDiv.contains(event.target) && event.target !== btn) {
+            if (targetDiv && targetDiv.style.display === 'block' && !targetDiv.contains(event.target) && event.target !== btn) {
                 hideFilters();
             }
         });
 
         // Prevent clicks inside the filter from closing it
-        targetDiv.addEventListener('click', function(event) {
-            event.stopPropagation();
-        });
+        if (targetDiv) {
+            targetDiv.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+        }
 
         // Add CSS for smooth transitions
         const style = document.createElement('style');
