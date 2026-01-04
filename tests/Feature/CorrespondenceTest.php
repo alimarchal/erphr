@@ -1,0 +1,260 @@
+<?php
+
+use App\Models\Correspondence;
+use App\Models\CorrespondenceCategory;
+use App\Models\CorrespondencePriority;
+use App\Models\CorrespondenceStatus;
+use App\Models\Division;
+use App\Models\LetterType;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->letterType = LetterType::factory()->create();
+    $this->category = CorrespondenceCategory::factory()->create();
+    $this->division = Division::factory()->create();
+    $this->status = CorrespondenceStatus::factory()->initial()->create();
+    $this->priority = CorrespondencePriority::factory()->create();
+});
+
+test('guests cannot access correspondence index', function () {
+    $this->get(route('correspondence.index'))
+        ->assertRedirect(route('login'));
+});
+
+test('authenticated users can view correspondence index', function () {
+    $this->actingAs($this->user);
+
+    $this->get(route('correspondence.index'))
+        ->assertOk()
+        ->assertViewIs('correspondence.index')
+        ->assertViewHas('correspondences');
+});
+
+test('authenticated users can view create correspondence form', function () {
+    $this->actingAs($this->user);
+
+    $this->get(route('correspondence.create'))
+        ->assertOk()
+        ->assertViewIs('correspondence.create');
+});
+
+test('authenticated users can create a receipt correspondence', function () {
+    $this->actingAs($this->user);
+
+    $correspondenceData = [
+        'type' => 'Receipt',
+        'letter_type_id' => $this->letterType->id,
+        'category_id' => $this->category->id,
+        'sender_name' => 'Test Organization',
+        'to_division_id' => $this->division->id,
+        'letter_date' => '2025-05-01',
+        'received_date' => '2025-05-02',
+        'subject' => 'Test Subject for Receipt',
+        'status_id' => $this->status->id,
+        'priority_id' => $this->priority->id,
+    ];
+
+    $this->post(route('correspondence.store'), $correspondenceData)
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('correspondences', [
+        'type' => 'Receipt',
+        'subject' => 'Test Subject for Receipt',
+        'letter_type_id' => $this->letterType->id,
+        'sender_name' => 'Test Organization',
+        'created_by' => $this->user->id,
+    ]);
+});
+
+test('authenticated users can add attachment to correspondence', function () {
+    Storage::fake('public');
+
+    $this->actingAs($this->user);
+
+    $correspondenceData = [
+        'type' => 'Receipt',
+        'letter_type_id' => $this->letterType->id,
+        'category_id' => $this->category->id,
+        'sender_name' => 'Test Organization',
+        'to_division_id' => $this->division->id,
+        'letter_date' => '2025-05-01',
+        'received_date' => '2025-05-02',
+        'subject' => 'Test Subject for Receipt Attachment',
+        'status_id' => $this->status->id,
+        'priority_id' => $this->priority->id,
+        'attachments' => [
+            UploadedFile::fake()->image('attachment.jpg'),
+        ],
+    ];
+
+    $this->post(route('correspondence.store'), $correspondenceData)
+        ->assertRedirect();
+
+    $correspondence = Correspondence::where('subject', 'Test Subject for Receipt Attachment')->first();
+
+    expect($correspondence)->not->toBeNull();
+    expect($correspondence->getMedia('attachments'))->toHaveCount(1);
+
+    $this->assertDatabaseHas('media', [
+        'collection_name' => 'attachments',
+        'model_type' => Correspondence::class,
+        'model_id' => $correspondence->id,
+    ]);
+});
+
+test('authenticated users can create a dispatch correspondence', function () {
+    $this->actingAs($this->user);
+
+    $correspondenceData = [
+        'type' => 'Dispatch',
+        'letter_type_id' => $this->letterType->id,
+        'category_id' => $this->category->id,
+        'sender_name' => 'Ministry of Finance',
+        'to_division_id' => $this->division->id,
+        'letter_date' => '2025-05-01',
+        'dispatch_date' => '2025-05-02',
+        'subject' => 'Test Subject for Dispatch',
+        'status_id' => $this->status->id,
+        'priority_id' => $this->priority->id,
+    ];
+
+    $this->post(route('correspondence.store'), $correspondenceData)
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('correspondences', [
+        'type' => 'Dispatch',
+        'subject' => 'Test Subject for Dispatch',
+        'created_by' => $this->user->id,
+    ]);
+});
+
+test('correspondence creation requires type', function () {
+    $this->actingAs($this->user);
+
+    $this->post(route('correspondence.store'), [
+        'type' => '',
+        'subject' => 'Test Subject',
+    ])->assertSessionHasErrors(['type']);
+});
+
+test('correspondence creation requires subject', function () {
+    $this->actingAs($this->user);
+
+    $this->post(route('correspondence.store'), [
+        'type' => 'Receipt',
+        'subject' => '',
+    ])->assertSessionHasErrors(['subject']);
+});
+
+test('correspondence type must be valid', function () {
+    $this->actingAs($this->user);
+
+    $this->post(route('correspondence.store'), [
+        'type' => 'InvalidType',
+        'subject' => 'Test Subject',
+    ])->assertSessionHasErrors(['type']);
+});
+
+test('authenticated users can view a correspondence', function () {
+    $this->actingAs($this->user);
+
+    $correspondence = Correspondence::factory()->create();
+
+    $this->get(route('correspondence.show', $correspondence))
+        ->assertOk()
+        ->assertViewIs('correspondence.show')
+        ->assertViewHas('correspondence');
+});
+
+test('authenticated users can view edit correspondence form', function () {
+    $this->actingAs($this->user);
+
+    $correspondence = Correspondence::factory()->create();
+
+    $this->get(route('correspondence.edit', $correspondence))
+        ->assertOk()
+        ->assertViewIs('correspondence.edit')
+        ->assertViewHas('correspondence');
+});
+
+test('authenticated users can update a correspondence', function () {
+    $this->actingAs($this->user);
+
+    $correspondence = Correspondence::factory()->create();
+
+    $updatedData = [
+        'type' => $correspondence->type,
+        'letter_type_id' => $this->letterType->id,
+        'category_id' => $this->category->id,
+        'sender_name' => 'Updated Sender Name',
+        'to_division_id' => $this->division->id,
+        'letter_date' => '2025-05-01',
+        'received_date' => '2025-05-02',
+        'subject' => 'Updated Subject',
+        'status_id' => $this->status->id,
+        'priority_id' => $this->priority->id,
+    ];
+
+    $this->put(route('correspondence.update', $correspondence), $updatedData)
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('correspondences', [
+        'id' => $correspondence->id,
+        'subject' => 'Updated Subject',
+        'sender_name' => 'Updated Sender Name',
+        'updated_by' => $this->user->id,
+    ]);
+});
+
+test('authenticated users can delete a correspondence', function () {
+    $this->actingAs($this->user);
+
+    $correspondence = Correspondence::factory()->create();
+
+    $this->delete(route('correspondence.destroy', $correspondence))
+        ->assertRedirect(route('correspondence.index', ['type' => $correspondence->type]))
+        ->assertSessionHas('success');
+
+    $this->assertSoftDeleted('correspondences', [
+        'id' => $correspondence->id,
+    ]);
+});
+
+test('correspondence index can be filtered by type', function () {
+    $this->actingAs($this->user);
+
+    Correspondence::factory()->receipt()->create(['subject' => 'Receipt Letter']);
+    Correspondence::factory()->dispatch()->create(['subject' => 'Dispatch Letter']);
+
+    $this->get(route('correspondence.index', ['type' => 'Receipt']))
+        ->assertOk()
+        ->assertSee('Receipt Letter')
+        ->assertDontSee('Dispatch Letter');
+});
+
+test('correspondence generates register number on creation', function () {
+    $this->actingAs($this->user);
+
+    $correspondence = Correspondence::factory()->create([
+        'type' => 'Receipt',
+        'to_division_id' => $this->division->id,
+    ]);
+
+    expect($correspondence->register_number)->not->toBeNull();
+    expect($correspondence->register_number)->toContain('RR');
+});
+
+test('dispatch correspondence generates register number with DR prefix', function () {
+    $this->actingAs($this->user);
+
+    $correspondence = Correspondence::factory()->create([
+        'type' => 'Dispatch',
+        'to_division_id' => $this->division->id,
+    ]);
+
+    expect($correspondence->register_number)->not->toBeNull();
+    expect($correspondence->register_number)->toContain('DR');
+});

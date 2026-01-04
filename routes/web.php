@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CorrespondenceController;
 use App\Http\Controllers\DivisionController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -33,6 +34,22 @@ Route::middleware(['auth'])->group(function () {
 
     // Divisions CRUD
     Route::resource('settings/divisions', DivisionController::class)->names('divisions');
+
+    // Correspondence Module Routes
+    Route::prefix('correspondence')->name('correspondence.')->group(function () {
+        // Main correspondence CRUD
+        Route::get('/', [CorrespondenceController::class, 'index'])->name('index');
+        Route::get('/create', [CorrespondenceController::class, 'create'])->name('create');
+        Route::post('/', [CorrespondenceController::class, 'store'])->name('store');
+        Route::get('/{correspondence}', [CorrespondenceController::class, 'show'])->name('show');
+        Route::get('/{correspondence}/edit', [CorrespondenceController::class, 'edit'])->name('edit');
+        Route::put('/{correspondence}', [CorrespondenceController::class, 'update'])->name('update');
+        Route::delete('/{correspondence}', [CorrespondenceController::class, 'destroy'])->name('destroy');
+
+        // Marking and movement actions
+        Route::post('/{correspondence}/mark', [CorrespondenceController::class, 'mark'])->name('mark');
+        Route::post('/{correspondence}/movement', [CorrespondenceController::class, 'updateMovement'])->name('movement.update');
+    });
 });
 
 Route::middleware([
