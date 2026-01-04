@@ -37,6 +37,7 @@ class UpdateCorrespondenceRequest extends FormRequest
             'region_id' => ['nullable', 'exists:regions,id'],
             'branch_id' => ['nullable', 'exists:branches,id'],
             'addressed_to_user_id' => ['nullable', 'exists:users,id'],
+            'initial_action' => ['nullable', 'string', 'max:50'],
             'status_id' => ['nullable', 'exists:correspondence_statuses,id'],
             'priority_id' => ['nullable', 'exists:correspondence_priorities,id'],
             'confidentiality' => ['nullable', Rule::in(['Normal', 'Confidential', 'Secret', 'TopSecret'])],

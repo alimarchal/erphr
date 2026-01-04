@@ -17,7 +17,9 @@ class CorrespondencePathGenerator implements PathGenerator
         if ($model instanceof CorrespondenceMovement) {
             $correspondence = $model->correspondence;
 
-            return $this->generateCorrespondencePath($correspondence).'/movements/'.$model->id.'/';
+            // Put movement attachments in the same folder as the main correspondence
+            // to keep the structure simple as requested by the user
+            return $this->generateCorrespondencePath($correspondence);
         }
 
         // Handle Correspondence attachments
@@ -54,12 +56,12 @@ class CorrespondencePathGenerator implements PathGenerator
             $date = $correspondence->created_at;
         }
 
-        // Format: Register Type/YYYY-MM/YYYY-MM-DD/REGISTER-NUMBER
-        $monthFolder = $date->format('Y-m');
+        // Format: Register Type/YYYY-MM-DD/REGISTER-NUMBER
+        // Simplified as requested: removed month folder
         $dateFolder = $date->format('Y-m-d');
         $registerNumber = $correspondence->register_number;
 
-        return "{$registerType}/{$monthFolder}/{$dateFolder}/{$registerNumber}/";
+        return "{$registerType}/{$dateFolder}/{$registerNumber}/";
     }
 
     protected function getBasePath(Media $media): string

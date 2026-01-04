@@ -107,6 +107,14 @@ class CorrespondenceController extends Controller
         try {
             $data = $request->validated();
 
+            // If receipt, default to_division_id to HRMD if not provided
+            if ($data['type'] === 'Receipt' && empty($data['to_division_id'])) {
+                $hrmd = Division::where('short_name', 'HRMD')->first();
+                if ($hrmd) {
+                    $data['to_division_id'] = $hrmd->id;
+                }
+            }
+
             // Set initial status if not provided
             if (empty($data['status_id'])) {
                 $initialStatus = CorrespondenceStatus::where('type', $data['type'])
@@ -123,6 +131,18 @@ class CorrespondenceController extends Controller
             }
 
             $correspondence = Correspondence::create($data);
+
+            // Create initial movement if addressed to someone
+            if (! empty($data['addressed_to_user_id'])) {
+                $correspondence->movements()->create([
+                    'from_user_id' => auth()->id(),
+                    'to_user_id' => $data['addressed_to_user_id'],
+                    'to_division_id' => $data['to_division_id'] ?? null,
+                    'action' => $data['initial_action'] ?? 'Mark',
+                    'instructions' => 'Initial marking upon receipt.',
+                    'sequence' => 1,
+                ]);
+            }
 
             // Handle file attachments
             if ($request->hasFile('attachments')) {

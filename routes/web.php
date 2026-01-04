@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\CorrespondenceController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -34,6 +37,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Divisions CRUD
     Route::resource('settings/divisions', DivisionController::class)->names('divisions');
+
+    // User Management
+    Route::resource('users', UserController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
 
     // Correspondence Module Routes
     Route::prefix('correspondence')->name('correspondence.')->group(function () {

@@ -208,6 +208,7 @@
         ['label' => 'Register No.'],
         ['label' => 'Subject'],
         ['label' => 'From/To'],
+        ['label' => 'Confidentiality', 'align' => 'text-center'],
         ['label' => 'Priority', 'align' => 'text-center'],
         ['label' => 'Status', 'align' => 'text-center'],
         ['label' => 'Current Holder'],
@@ -234,6 +235,9 @@
                 <a href="{{ route('correspondence.show', $item) }}" class="text-blue-600 hover:underline font-medium">
                     {{ $item->register_number }}
                 </a>
+                @if($item->letterType)
+                    <div class="text-xs font-semibold text-gray-600">{{ $item->letterType->name }}</div>
+                @endif
                 @if($item->reference_number)
                     <div class="text-xs text-gray-500">Ref: {{ $item->reference_number }}</div>
                 @endif
@@ -242,9 +246,18 @@
             {{-- Subject --}}
             <td class="py-2 px-2 max-w-xs">
                 <div title="{{ $item->subject }}">{{ Str::limit($item->subject, 50) }}</div>
-                @if($item->category)
-                    <div class="text-xs text-gray-500">{{ $item->category->name }}</div>
-                @endif
+                <div class="flex flex-wrap gap-1 mt-1">
+                    @if($item->category)
+                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded border border-gray-200">
+                            {{ $item->category->name }}
+                        </span>
+                    @endif
+                    @if($item->initial_action)
+                        <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100">
+                            Marking: {{ $item->initial_action }}
+                        </span>
+                    @endif
+                </div>
             </td>
 
             {{-- From/To --}}
@@ -255,6 +268,21 @@
                     {{ $item->fromDivision->short_name }}
                 @elseif($item->type === 'Dispatch' && $item->toDivision)
                     {{ $item->toDivision->short_name }}
+                @else
+                    -
+                @endif
+            </td>
+
+            {{-- Confidentiality --}}
+            <td class="py-2 px-2 text-center">
+                @if($item->confidentiality)
+                    <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full
+                        {{ $item->confidentiality === 'Normal' ? 'bg-gray-100 text-gray-700' : '' }}
+                        {{ $item->confidentiality === 'Confidential' ? 'bg-blue-100 text-blue-700' : '' }}
+                        {{ $item->confidentiality === 'Secret' ? 'bg-orange-100 text-orange-700' : '' }}
+                        {{ $item->confidentiality === 'TopSecret' ? 'bg-red-100 text-red-700' : '' }}">
+                        {{ $item->confidentiality }}
+                    </span>
                 @else
                     -
                 @endif
@@ -296,7 +324,10 @@
 
             {{-- Current Holder --}}
             <td class="py-2 px-2">
-                {{ $item->currentHolder?->name ?? '-' }}
+                <div class="font-semibold text-gray-900">{{ $item->currentHolder?->name ?? '-' }}</div>
+                @if($item->toDivision)
+                    <div class="text-xs text-gray-500">{{ $item->toDivision->short_name }}</div>
+                @endif
                 @if($item->due_date)
                     <div class="text-xs {{ $item->isOverdue() ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
                         Due: {{ $item->due_date->format('d-m-Y') }}

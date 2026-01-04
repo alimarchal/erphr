@@ -10,7 +10,7 @@
 <div class="border-b pb-4 mb-4">
     <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $isReceipt ? 'Receipt' : 'Dispatch' }} Information</h3>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <x-label for="letter_type_id" value="Letter Type" />
             <select id="letter_type_id" name="letter_type_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
@@ -49,21 +49,6 @@
                 @endforeach
             </select>
         </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        <div>
-            <x-label for="reference_number" value="Reference Number" />
-            <x-input id="reference_number" type="text" name="reference_number" class="mt-1 block w-full"
-                :value="old('reference_number', $correspondence?->reference_number)"
-                placeholder="Original letter reference" />
-        </div>
-
-        <div>
-            <x-label for="letter_date" value="Letter Date" />
-            <x-input id="letter_date" type="date" name="letter_date" class="mt-1 block w-full"
-                :value="old('letter_date', $correspondence?->letter_date?->format('Y-m-d'))" />
-        </div>
 
         <div>
             <x-label :for="$isReceipt ? 'received_date' : 'dispatch_date'"
@@ -77,36 +62,94 @@
             @endif
         </div>
     </div>
-</div>
 
-{{-- Subject and Description --}}
-<div class="border-b pb-4 mb-4">
-    <div class="mb-4">
-        <x-label for="subject" value="Subject" :required="true" />
-        <x-input id="subject" type="text" name="subject" class="mt-1 block w-full"
-            :value="old('subject', $correspondence?->subject)" required
-            placeholder="Enter the subject of the correspondence" />
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+        <div>
+            <x-label for="reference_number" value="Reference Number" />
+            <x-input id="reference_number" type="text" name="reference_number" class="mt-1 block w-full"
+                :value="old('reference_number', $correspondence?->reference_number)"
+                placeholder="Original letter reference" />
+        </div>
+
+        <div>
+            <x-label for="letter_date" value="Letter Date" />
+            <x-input id="letter_date" type="date" name="letter_date" class="mt-1 block w-full"
+                :value="old('letter_date', $correspondence?->letter_date?->format('Y-m-d'))" />
+        </div>
+
+        @if($isReceipt)
+            <div>
+                <x-label for="status_id" value="Status" />
+                <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="">Auto (Initial)</option>
+                    @foreach($statuses as $status)
+                        <option value="{{ $status->id }}"
+                            {{ old('status_id', $correspondence?->status_id) == $status->id ? 'selected' : '' }}>
+                            {{ $status->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <x-label for="confidentiality" value="Confidentiality" />
+                <select id="confidentiality" name="confidentiality" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="Normal" {{ old('confidentiality', $correspondence?->confidentiality ?? 'Normal') === 'Normal' ? 'selected' : '' }}>Normal</option>
+                    <option value="Confidential" {{ old('confidentiality', $correspondence?->confidentiality) === 'Confidential' ? 'selected' : '' }}>Confidential</option>
+                    <option value="Secret" {{ old('confidentiality', $correspondence?->confidentiality) === 'Secret' ? 'selected' : '' }}>Secret</option>
+                    <option value="TopSecret" {{ old('confidentiality', $correspondence?->confidentiality) === 'TopSecret' ? 'selected' : '' }}>Top Secret</option>
+                </select>
+            </div>
+        @endif
+
+        @if(!$isReceipt)
+            <div>
+                <x-label for="due_date" value="Expected Reply Date" />
+                <x-input id="due_date" type="date" name="due_date" class="mt-1 block w-full"
+                    :value="old('due_date', $correspondence?->due_date?->format('Y-m-d'))" />
+            </div>
+
+            <div>
+                <x-label for="confidentiality" value="Confidentiality" />
+                <select id="confidentiality" name="confidentiality" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="Normal" {{ old('confidentiality', $correspondence?->confidentiality ?? 'Normal') === 'Normal' ? 'selected' : '' }}>Normal</option>
+                    <option value="Confidential" {{ old('confidentiality', $correspondence?->confidentiality) === 'Confidential' ? 'selected' : '' }}>Confidential</option>
+                    <option value="Secret" {{ old('confidentiality', $correspondence?->confidentiality) === 'Secret' ? 'selected' : '' }}>Secret</option>
+                    <option value="TopSecret" {{ old('confidentiality', $correspondence?->confidentiality) === 'TopSecret' ? 'selected' : '' }}>Top Secret</option>
+                </select>
+            </div>
+        @endif
     </div>
 
-    <div>
-        <x-label for="description" value="Description / Summary" />
-        <textarea id="description" name="description" rows="3"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            placeholder="Brief description or summary...">{{ old('description', $correspondence?->description) }}</textarea>
-    </div>
+    @if(!$isReceipt)
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <div>
+                <x-label for="status_id" value="Status" />
+                <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="">Auto (Initial)</option>
+                    @foreach($statuses as $status)
+                        <option value="{{ $status->id }}"
+                            {{ old('status_id', $correspondence?->status_id) == $status->id ? 'selected' : '' }}>
+                            {{ $status->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    @endif
 </div>
 
-{{-- From/To Information --}}
+{{-- From/To Information (Most Important Section) --}}
 <div class="border-b pb-4 mb-4">
     <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $isReceipt ? 'Sender' : 'Recipient' }} Information</h3>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <x-label for="sender_name" value="External Party (Sender/Recipient)" />
             <x-input id="sender_name" type="text" name="sender_name" class="mt-1 block w-full"
                 :value="old('sender_name', $correspondence?->sender_name)"
                 placeholder="e.g., Ministry of Finance, ABC Company, President Office" />
-            <p class="text-xs text-gray-500 mt-1">Enter for external correspondence (government, company, etc.)</p>
+            <p class="text-xs text-gray-500 mt-1">Enter for external correspondence</p>
         </div>
 
         <div>
@@ -123,9 +166,7 @@
             </select>
             <p class="text-xs text-gray-500 mt-1">Select for internal correspondence</p>
         </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div>
             <x-label for="region_id" value="Region" />
             <select id="region_id" name="region_id"
@@ -153,15 +194,31 @@
                     </option>
                 @endforeach
             </select>
-            <p class="text-xs text-gray-500 mt-1">Branch will filter based on selected Region</p>
         </div>
+    </div>
+</div>
+
+{{-- Subject and Description --}}
+<div class="border-b pb-4 mb-4">
+    <div class="mb-4">
+        <x-label for="subject" value="Subject" :required="true" />
+        <x-input id="subject" type="text" name="subject" class="mt-1 block w-full"
+            :value="old('subject', $correspondence?->subject)" required
+            placeholder="Enter the subject of the correspondence" />
+    </div>
+
+    <div>
+        <x-label for="description" value="Description / Summary" />
+        <textarea id="description" name="description" rows="3"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            placeholder="Brief description or summary...">{{ old('description', $correspondence?->description) }}</textarea>
     </div>
 </div>
 
 {{-- Assignment (Only for Receipt - not for Dispatch) --}}
 @if($isReceipt)
 <div class="border-b pb-4 mb-4">
-    <h3 class="text-lg font-medium text-gray-900 mb-4">Internal Assignment</h3>
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Initial Marking / Action Assignment</h3>
 
     @php
         // Calculate 7 working days (Monday-Friday) from today
@@ -173,27 +230,11 @@
                 $workingDaysAdded++;
             }
         }
-        // Get only HRMD division
-        $hrmdDivision = $divisions->firstWhere('short_name', 'HRMD') ?? $divisions->first();
     @endphp
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-            <x-label for="to_division_id" value="Assignment To Division" />
-            <select id="to_division_id" name="to_division_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Division</option>
-                @if($hrmdDivision)
-                    <option value="{{ $hrmdDivision->id }}"
-                        {{ old('to_division_id', $correspondence?->to_division_id ?? $hrmdDivision->id) == $hrmdDivision->id ? 'selected' : '' }}>
-                        {{ $hrmdDivision->name }} ({{ $hrmdDivision->short_name }})
-                    </option>
-                @endif
-            </select>
-            <p class="text-xs text-gray-500 mt-1">HRMD is the only assignment division for correspondence</p>
-        </div>
-
-        <div>
-            <x-label for="addressed_to_user_id" value="Addressed To (Person)" />
+            <x-label for="addressed_to_user_id" value="Addressed To" />
             <select id="addressed_to_user_id" name="addressed_to_user_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                 <option value="">Select Person</option>
                 @foreach($users as $user)
@@ -206,78 +247,28 @@
         </div>
 
         <div>
+            <x-label for="initial_action" value="Action Required" />
+            <select id="initial_action" name="initial_action" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <option value="">Select Action</option>
+                <option value="Mark" {{ old('initial_action', $correspondence?->initial_action) === 'Mark' ? 'selected' : '' }}>Mark</option>
+                <option value="ForAction" {{ old('initial_action', $correspondence?->initial_action) === 'ForAction' ? 'selected' : '' }}>For Action</option>
+                <option value="ForComments" {{ old('initial_action', $correspondence?->initial_action) === 'ForComments' ? 'selected' : '' }}>For Comments</option>
+                <option value="ForApproval" {{ old('initial_action', $correspondence?->initial_action) === 'ForApproval' ? 'selected' : '' }}>For Approval</option>
+                <option value="ForSignature" {{ old('initial_action', $correspondence?->initial_action) === 'ForSignature' ? 'selected' : '' }}>For Signature</option>
+                <option value="ForReview" {{ old('initial_action', $correspondence?->initial_action) === 'ForReview' ? 'selected' : '' }}>For Review</option>
+                <option value="ForInfo" {{ old('initial_action', $correspondence?->initial_action) === 'ForInfo' ? 'selected' : '' }}>For Info</option>
+                <option value="ForRecord" {{ old('initial_action', $correspondence?->initial_action) === 'ForRecord' ? 'selected' : '' }}>For Record</option>
+            </select>
+        </div>
+
+        <div>
             <x-label for="due_date" value="Due Date" />
             <x-input id="due_date" type="date" name="due_date" class="mt-1 block w-full"
                 :value="old('due_date', $correspondence?->due_date?->format('Y-m-d') ?? $defaultDueDate->format('Y-m-d'))" />
-            <p class="text-xs text-gray-500 mt-1">Auto-set to 7 working days from today</p>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div>
-            <x-label for="status_id" value="Status" />
-            <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Auto (Initial)</option>
-                @foreach($statuses as $status)
-                    <option value="{{ $status->id }}"
-                        {{ old('status_id', $correspondence?->status_id) == $status->id ? 'selected' : '' }}>
-                        {{ $status->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div>
-            <x-label for="confidentiality" value="Confidentiality" />
-            <select id="confidentiality" name="confidentiality" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="Normal" {{ old('confidentiality', $correspondence?->confidentiality ?? 'Normal') === 'Normal' ? 'selected' : '' }}>Normal</option>
-                <option value="Confidential" {{ old('confidentiality', $correspondence?->confidentiality) === 'Confidential' ? 'selected' : '' }}>Confidential</option>
-                <option value="Secret" {{ old('confidentiality', $correspondence?->confidentiality) === 'Secret' ? 'selected' : '' }}>Secret</option>
-                <option value="TopSecret" {{ old('confidentiality', $correspondence?->confidentiality) === 'TopSecret' ? 'selected' : '' }}>Top Secret</option>
-            </select>
         </div>
     </div>
 </div>
 @endif
-
-{{-- Due Date (For both Receipt and Dispatch) --}}
-<div class="border-b pb-4 mb-4">
-    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $isReceipt ? 'Response' : 'Expected Reply' }} Timeline</h3>
-
-    @php
-        // Calculate 7 working days from today if not set
-        $defaultDueDate = now();
-        $workingDaysAdded = 0;
-        while ($workingDaysAdded < 7) {
-            $defaultDueDate->addDay();
-            if ($defaultDueDate->isWeekday()) {
-                $workingDaysAdded++;
-            }
-        }
-    @endphp
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            <x-label for="due_date" value="{{ $isReceipt ? 'Due Date (Response Deadline)' : 'Expected Reply Date' }}" />
-            <x-input id="due_date" type="date" name="due_date" class="mt-1 block w-full"
-                :value="old('due_date', $correspondence?->due_date?->format('Y-m-d') ?? $defaultDueDate->format('Y-m-d'))" />
-            <p class="text-xs text-gray-500 mt-1">{{ $isReceipt ? 'Deadline to respond to this correspondence' : 'When do you expect a reply?' }}</p>
-        </div>
-
-        <div>
-            <x-label for="status_id" value="Status" />
-            <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Auto (Initial)</option>
-                @foreach($statuses as $status)
-                    <option value="{{ $status->id }}"
-                        {{ old('status_id', $correspondence?->status_id) == $status->id ? 'selected' : '' }}>
-                        {{ $status->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-</div>
 
 {{-- Delivery Information --}}
 <div class="border-b pb-4 mb-4">
@@ -351,3 +342,46 @@
         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
         placeholder="Any additional remarks...">{{ old('remarks', $correspondence?->remarks) }}</textarea>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const regionSelect = document.getElementById('region_id');
+    const branchSelect = document.getElementById('branch_id');
+    
+    if (regionSelect && branchSelect) {
+        const allBranchOptions = Array.from(branchSelect.options);
+
+        function filterBranches() {
+            const selectedRegionId = regionSelect.value;
+            
+            // Clear current options
+            branchSelect.innerHTML = '';
+            
+            // Add the default "Select Branch" option
+            const defaultOption = allBranchOptions.find(opt => opt.value === '');
+            if (defaultOption) {
+                branchSelect.appendChild(defaultOption.cloneNode(true));
+            }
+
+            // Filter and add matching options
+            allBranchOptions.forEach(option => {
+                if (option.value !== '' && (!selectedRegionId || option.getAttribute('data-region') === selectedRegionId)) {
+                    branchSelect.appendChild(option.cloneNode(true));
+                }
+            });
+
+            // Re-initialize Select2 if it's being used
+            if (typeof $ !== 'undefined' && $(branchSelect).data('select2')) {
+                $(branchSelect).trigger('change.select2');
+            }
+        }
+
+        regionSelect.addEventListener('change', filterBranches);
+        
+        // Initial filter if region is already selected (e.g., on edit or validation error)
+        if (regionSelect.value) {
+            filterBranches();
+        }
+    }
+});
+</script>

@@ -41,6 +41,7 @@ class Correspondence extends Model implements HasMedia
         'region_id',
         'branch_id',
         'addressed_to_user_id',
+        'initial_action',
         'status_id',
         'priority_id',
         'confidentiality',

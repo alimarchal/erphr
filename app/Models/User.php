@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class User extends Authenticatable
 {
@@ -23,9 +24,9 @@ class User extends Authenticatable
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+
     use HasProfilePhoto;
     use Notifiable;
-
     use TwoFactorAuthenticatable;
 
     /**
@@ -37,6 +38,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_super_admin',
+        'is_active',
     ];
 
     /**
@@ -90,5 +93,34 @@ class User extends Authenticatable
         return collect(explode(' ', $this->name))
             ->map(fn ($segment) => mb_substr($segment, 0, 1))
             ->join('');
+    }
+
+    public static function getAllowedFilters(): array
+    {
+        return [
+            'name',
+            'email',
+            'is_super_admin',
+            'is_active',
+            AllowedFilter::scope('role'),
+            'created_at',
+        ];
+    }
+
+    public static function getAllowedSorts(): array
+    {
+        return [
+            'name',
+            'email',
+            'created_at',
+        ];
+    }
+
+    public static function getAllowedIncludes(): array
+    {
+        return [
+            'roles',
+            'permissions',
+        ];
     }
 }

@@ -1,0 +1,122 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight inline-block">
+            Edit User: {{ $user->name }}
+        </h2>
+        <div class="flex justify-center items-center float-right">
+            <a href="{{ route('users.index') }}"
+                class="inline-flex items-center ml-2 px-4 py-2 bg-blue-950 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 focus:bg-green-800 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <!-- Arrow Left Icon SVG -->
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+    </x-slot>
+
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg p-6">
+                <form method="POST" action="{{ route('users.update', $user->id) }}">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300">Name:</label>
+                        <input type="text" name="name" value="{{ old('name', $user->name) }}" 
+                            class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                        @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300">Email:</label>
+                        <input type="email" name="email" value="{{ old('email', $user->email) }}" 
+                            class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                        @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300">Password (Leave blank to keep current password):</label>
+                        <input type="password" name="password" 
+                            class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                        @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300">Is Super Admin:</label>
+                            <select name="is_super_admin" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                <option value="No" {{ old('is_super_admin', $user->is_super_admin) == 'No' ? 'selected' : '' }}>No</option>
+                                <option value="Yes" {{ old('is_super_admin', $user->is_super_admin) == 'Yes' ? 'selected' : '' }}>Yes</option>
+                            </select>
+                            @error('is_super_admin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300">Status:</label>
+                            <select name="is_active" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                <option value="Yes" {{ old('is_active', $user->is_active) == 'Yes' ? 'selected' : '' }}>Active</option>
+                                <option value="No" {{ old('is_active', $user->is_active) == 'No' ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                            @error('is_active') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300">Roles:</label>
+                        <div class="mt-2">
+                            @foreach($roles as $role)
+                                <label class="inline-flex items-center mr-4 mb-2">
+                                    <input type="checkbox" name="roles[]" value="{{ $role->id }}" 
+                                        {{ in_array($role->id, old('roles', $userRoles)) ? 'checked' : '' }}
+                                        class="form-checkbox h-4 w-4 text-indigo-600">
+                                    <span class="ml-2 text-gray-700 dark:text-gray-300">{{ $role->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('roles') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Individual Permissions Section -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 mb-3">Individual Permissions:</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+                            @foreach($permissions as $permission)
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
+                                        {{ in_array($permission->id, old('permissions', $userPermissions)) ? 'checked' : '' }}
+                                        class="rounded border-gray-300 dark:border-gray-700 text-blue-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <span class="ml-2 text-gray-700 dark:text-gray-300 text-sm">{{ $permission->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <small class="text-gray-500 dark:text-gray-400 mt-2 block">Note: Individual permissions are granted in addition to role-based permissions. Unchecking a permission will revoke it from the user.</small>
+                        @error('permissions') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300">Super Admin:</label>
+                        <select name="is_super_admin" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                            <option value="No" {{ old('is_super_admin', $user->is_super_admin) == 'No' ? 'selected' : '' }}>No</option>
+                            <option value="Yes" {{ old('is_super_admin', $user->is_super_admin) == 'Yes' ? 'selected' : '' }}>Yes</option>
+                        </select>
+                        @error('is_super_admin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300">Status:</label>
+                        <select name="is_active" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                            <option value="Yes" {{ old('is_active', $user->is_active) == 'Yes' ? 'selected' : '' }}>Active</option>
+                            <option value="No" {{ old('is_active', $user->is_active) == 'No' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                        @error('is_active') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-6 py-2 bg-blue-800 text-white rounded-md hover:bg-blue-900 transition duration-200">Update User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
