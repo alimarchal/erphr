@@ -207,11 +207,14 @@
         ['label' => 'Date'],
         ['label' => 'Register No.'],
         ['label' => 'Subject'],
+        ['label' => 'Category'],
         ['label' => 'From/To'],
         ['label' => 'Confidentiality', 'align' => 'text-center'],
         ['label' => 'Priority', 'align' => 'text-center'],
         ['label' => 'Status', 'align' => 'text-center'],
         ['label' => 'Current Holder'],
+        ['label' => 'Due Date', 'align' => 'text-center'],
+        ['label' => 'Pending', 'align' => 'text-center'],
         ['label' => 'Actions', 'align' => 'text-center'],
     ]" emptyMessage="No correspondence found." :emptyRoute="route('correspondence.create', ['type' => 'Receipt'])"
         emptyLinkText="Create one">
@@ -245,19 +248,37 @@
 
             {{-- Subject --}}
             <td class="py-2 px-2 max-w-xs">
-                <div title="{{ $item->subject }}">{{ Str::limit($item->subject, 50) }}</div>
-                <div class="flex flex-wrap gap-1 mt-1">
-                    @if($item->category)
-                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded border border-gray-200">
-                            {{ $item->category->name }}
-                        </span>
+                <div class="flex items-start gap-2">
+                    <div title="{{ $item->subject }}" class="font-medium text-gray-900 flex-1">{{ Str::limit($item->subject, 50) }}</div>
+                    @if($item->hasMedia('attachments'))
+                        <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
                     @endif
+                </div>
+                <div class="flex flex-wrap gap-1 mt-1">
                     @if($item->initial_action)
                         <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100">
                             Marking: {{ $item->initial_action }}
                         </span>
                     @endif
+                    @if($item->is_replied)
+                        <span class="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100">
+                            Replied
+                        </span>
+                    @endif
                 </div>
+            </td>
+
+            {{-- Category --}}
+            <td class="py-2 px-2">
+                @if($item->category)
+                    <span class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded border border-gray-200">
+                        {{ $item->category->name }}
+                    </span>
+                @else
+                    -
+                @endif
             </td>
 
             {{-- From/To --}}
@@ -303,6 +324,36 @@
                 @endif
             </td>
 
+            {{-- Due Date --}}
+            <td class="py-2 px-2 text-center">
+                @if($item->due_date)
+                    <div class="text-xs {{ $item->due_date->isPast() && !$item->closed_at ? 'text-red-600 font-bold' : 'text-gray-600' }}">
+                        {{ $item->due_date->format('d M, Y') }}
+                    </div>
+                @else
+                    <span class="text-gray-400">-</span>
+                @endif
+            </td>
+
+            {{-- Pending --}}
+            <td class="py-2 px-2 text-center">
+                @php
+                    $pendingDays = 0;
+                    if (!$item->closed_at) {
+                        $startDate = $item->received_date ?? $item->created_at;
+                        $pendingDays = now()->diffInDays($startDate);
+                    }
+                @endphp
+
+                @if(!$item->closed_at)
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $pendingDays > 7 ? 'bg-red-100 text-red-700' : ($pendingDays > 3 ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700') }}">
+                        {{ $pendingDays }} {{ Str::plural('Day', $pendingDays) }}
+                    </span>
+                @else
+                    <span class="text-xs text-gray-400 italic">Closed</span>
+                @endif
+            </td>
+
             {{-- Status --}}
             <td class="py-2 px-2 text-center">
                 @if($item->status)
@@ -325,14 +376,19 @@
             {{-- Current Holder --}}
             <td class="py-2 px-2">
                 <div class="font-semibold text-gray-900">{{ $item->currentHolder?->name ?? '-' }}</div>
-                @if($item->toDivision)
-                    <div class="text-xs text-gray-500">{{ $item->toDivision->short_name }}</div>
-                @endif
-                @if($item->due_date)
-                    <div class="text-xs {{ $item->isOverdue() ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
-                        Due: {{ $item->due_date->format('d-m-Y') }}
-                    </div>
-                @endif
+                <div class="flex flex-col gap-0.5 mt-0.5">
+                    @if($item->toDivision)
+                        <div class="text-[10px] text-gray-500 uppercase tracking-wider font-medium">{{ $item->toDivision->short_name }}</div>
+                    @endif
+                    @if($item->current_holder_since && !$item->closed_at)
+                        @php
+                            $daysWithHolder = now()->diffInDays($item->current_holder_since);
+                        @endphp
+                        <div class="text-[10px] {{ $daysWithHolder > 3 ? 'text-orange-600 font-bold' : 'text-gray-400' }}">
+                            Since {{ $daysWithHolder }} {{ Str::plural('day', $daysWithHolder) }}
+                        </div>
+                    @endif
+                </div>
             </td>
 
             {{-- Actions --}}

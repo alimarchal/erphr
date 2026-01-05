@@ -26,17 +26,23 @@
                         {{ __('Dispatches') }}
                     </x-nav-link>
 
-                    <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
-                        {{ __('Users') }}
-                    </x-nav-link>
+                    @can('view users')
+                        <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                            {{ __('Users') }}
+                        </x-nav-link>
+                    @endcan
 
-                    <x-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
-                        {{ __('Roles') }}
-                    </x-nav-link>
+                    @can('view roles')
+                        <x-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
+                            {{ __('Roles') }}
+                        </x-nav-link>
+                    @endcan
 
-                    <x-nav-link href="{{ route('permissions.index') }}" :active="request()->routeIs('permissions.*')">
-                        {{ __('Permissions') }}
-                    </x-nav-link>
+                    @can('view permissions')
+                        <x-nav-link href="{{ route('permissions.index') }}" :active="request()->routeIs('permissions.*')">
+                            {{ __('Permissions') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -170,11 +176,39 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link href="{{ route('correspondence.index', ['type' => 'Receipt']) }}"
+                :active="request()->routeIs('correspondence.*') && request('type') === 'Receipt'">
+                {{ __('Receipts') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link href="{{ route('correspondence.index', ['type' => 'Dispatch']) }}"
+                :active="request()->routeIs('correspondence.*') && request('type') === 'Dispatch'">
+                {{ __('Dispatches') }}
+            </x-responsive-nav-link>
+
+            @can('view users')
+                <x-responsive-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                    {{ __('Users') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view roles')
+                <x-responsive-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
+                    {{ __('Roles') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view permissions')
+                <x-responsive-nav-link href="{{ route('permissions.index') }}" :active="request()->routeIs('permissions.*')">
+                    {{ __('Permissions') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

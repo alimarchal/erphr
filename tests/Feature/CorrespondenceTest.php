@@ -11,7 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->create(['is_super_admin' => 'Yes']);
     $this->letterType = LetterType::factory()->create();
     $this->category = CorrespondenceCategory::factory()->create();
     $this->division = Division::factory()->create();
@@ -233,6 +233,28 @@ test('correspondence index can be filtered by type', function () {
         ->assertOk()
         ->assertSee('Receipt Letter')
         ->assertDontSee('Dispatch Letter');
+});
+
+test('regular users can only see correspondence they are the current holder of', function () {
+    $regularUser = User::factory()->create(['is_super_admin' => 'No']);
+    $otherUser = User::factory()->create(['is_super_admin' => 'No']);
+
+    Correspondence::factory()->create([
+        'subject' => 'My Correspondence',
+        'current_holder_id' => $regularUser->id,
+    ]);
+
+    Correspondence::factory()->create([
+        'subject' => 'Other Correspondence',
+        'current_holder_id' => $otherUser->id,
+    ]);
+
+    $this->actingAs($regularUser);
+
+    $this->get(route('correspondence.index'))
+        ->assertOk()
+        ->assertSee('My Correspondence')
+        ->assertDontSee('Other Correspondence');
 });
 
 test('correspondence generates register number on creation', function () {

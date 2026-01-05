@@ -28,6 +28,7 @@ class CorrespondenceController extends Controller
     public function index(Request $request)
     {
         $type = $request->get('type'); // null means show both
+        $user = auth()->user();
 
         $query = QueryBuilder::for(Correspondence::query())
             ->allowedFilters([
@@ -50,6 +51,11 @@ class CorrespondenceController extends Controller
                 AllowedFilter::callback('overdue', fn ($query, $value) => $value ? $query->overdue() : null),
             ])
             ->with(['letterType', 'category', 'status', 'priority', 'currentHolder', 'toDivision', 'creator']);
+
+        // Filter by current holder if not admin/super-admin
+        if ($user->is_super_admin !== 'Yes' && ! $user->hasAnyRole(['super-admin', 'admin'])) {
+            $query->where('current_holder_id', $user->id);
+        }
 
         // Apply type filter if specified
         if ($type) {
