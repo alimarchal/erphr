@@ -370,7 +370,7 @@
                     @endif
                     @if($item->current_holder_since && !$item->closed_at)
                         @php
-                            $daysWithHolder = now()->diffInDays($item->current_holder_since);
+                            $daysWithHolder = (int) now()->diffInDays($item->current_holder_since);
                         @endphp
                         <div class="text-[9px] {{ $daysWithHolder > 3 ? 'text-orange-600 font-bold' : 'text-gray-400' }}">
                             Since {{ $daysWithHolder }} {{ Str::plural('day', $daysWithHolder) }}
@@ -385,7 +385,7 @@
                     $pendingDays = 0;
                     if (!$item->closed_at) {
                         $startDate = $item->received_date ?? $item->created_at;
-                        $pendingDays = now()->diffInDays($startDate);
+                        $pendingDays = (int) now()->diffInDays($startDate);
                     }
                 @endphp
 
