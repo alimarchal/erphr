@@ -16,11 +16,11 @@ class UserController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('role_or_permission:view users', only: ['index', 'show']),
-            new Middleware('role_or_permission:create users', only: ['create', 'store']),
-            new Middleware('role_or_permission:edit users', only: ['edit', 'update']),
-            new Middleware('role_or_permission:delete users', only: ['destroy']),
-            new Middleware('role_or_permission:assign permissions', only: ['store', 'update']),
+            new Middleware('can:view users', only: ['index', 'show']),
+            new Middleware('can:create users', only: ['create', 'store']),
+            new Middleware('can:edit users', only: ['edit', 'update']),
+            new Middleware('can:delete users', only: ['destroy']),
+            new Middleware('can:assign permissions', only: ['store', 'update']),
         ];
     }
 
@@ -60,11 +60,17 @@ class UserController extends Controller implements HasMiddleware
             'permissions.*' => 'exists:permissions,id',
         ]);
 
+        // Security: Only super-admins can create other super-admins
+        $isSuperAdmin = $request->is_super_admin;
+        if ($isSuperAdmin === 'Yes' && ! (auth()->user()->is_super_admin === 'Yes' || auth()->user()->hasRole('super-admin'))) {
+            $isSuperAdmin = 'No';
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'is_super_admin' => $request->is_super_admin,
+            'is_super_admin' => $isSuperAdmin,
             'is_active' => $request->is_active,
         ]);
 
@@ -121,10 +127,16 @@ class UserController extends Controller implements HasMiddleware
             'permissions.*' => 'exists:permissions,id',
         ]);
 
+        // Security: Only super-admins can change super-admin status
+        $isSuperAdmin = $request->is_super_admin;
+        if ($isSuperAdmin !== $user->is_super_admin && ! (auth()->user()->is_super_admin === 'Yes' || auth()->user()->hasRole('super-admin'))) {
+            $isSuperAdmin = $user->is_super_admin;
+        }
+
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
-            'is_super_admin' => $request->is_super_admin,
+            'is_super_admin' => $isSuperAdmin,
             'is_active' => $request->is_active,
         ];
 

@@ -239,6 +239,10 @@ test('regular users can only see correspondence they are the current holder of',
     $regularUser = User::factory()->create(['is_super_admin' => 'No']);
     $otherUser = User::factory()->create(['is_super_admin' => 'No']);
 
+    // Create the permission if it doesn't exist (for testing)
+    \Spatie\Permission\Models\Permission::findOrCreate('view correspondence');
+    $regularUser->givePermissionTo('view correspondence');
+
     Correspondence::factory()->create([
         'subject' => 'My Correspondence',
         'current_holder_id' => $regularUser->id,

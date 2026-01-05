@@ -43,14 +43,18 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-gray-700 dark:text-gray-300">Is Super Admin:</label>
-                            <select name="is_super_admin" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
-                                <option value="No" {{ old('is_super_admin', $user->is_super_admin) == 'No' ? 'selected' : '' }}>No</option>
-                                <option value="Yes" {{ old('is_super_admin', $user->is_super_admin) == 'Yes' ? 'selected' : '' }}>Yes</option>
-                            </select>
-                            @error('is_super_admin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
+                        @if(auth()->user()->is_super_admin === 'Yes' || auth()->user()->hasRole('super-admin'))
+                            <div>
+                                <label class="block text-gray-700 dark:text-gray-300">Is Super Admin:</label>
+                                <select name="is_super_admin" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                    <option value="No" {{ old('is_super_admin', $user->is_super_admin) == 'No' ? 'selected' : '' }}>No</option>
+                                    <option value="Yes" {{ old('is_super_admin', $user->is_super_admin) == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                </select>
+                                @error('is_super_admin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        @else
+                            <input type="hidden" name="is_super_admin" value="{{ $user->is_super_admin }}">
+                        @endif
 
                         <div>
                             <label class="block text-gray-700 dark:text-gray-300">Status:</label>
@@ -92,24 +96,6 @@
                         </div>
                         <small class="text-gray-500 dark:text-gray-400 mt-2 block">Note: Individual permissions are granted in addition to role-based permissions. Unchecking a permission will revoke it from the user.</small>
                         @error('permissions') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 dark:text-gray-300">Super Admin:</label>
-                        <select name="is_super_admin" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                            <option value="No" {{ old('is_super_admin', $user->is_super_admin) == 'No' ? 'selected' : '' }}>No</option>
-                            <option value="Yes" {{ old('is_super_admin', $user->is_super_admin) == 'Yes' ? 'selected' : '' }}>Yes</option>
-                        </select>
-                        @error('is_super_admin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 dark:text-gray-300">Status:</label>
-                        <select name="is_active" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                            <option value="Yes" {{ old('is_active', $user->is_active) == 'Yes' ? 'selected' : '' }}>Active</option>
-                            <option value="No" {{ old('is_active', $user->is_active) == 'No' ? 'selected' : '' }}>Inactive</option>
-                        </select>
-                        @error('is_active') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="flex justify-end">

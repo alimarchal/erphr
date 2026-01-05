@@ -15,13 +15,27 @@ use App\Models\Region;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class CorrespondenceController extends Controller
+class CorrespondenceController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:view correspondence', only: ['index', 'show']),
+            new Middleware('can:create correspondence', only: ['create', 'store']),
+            new Middleware('can:edit correspondence', only: ['edit', 'update']),
+            new Middleware('can:delete correspondence', only: ['destroy']),
+            new Middleware('can:mark correspondence', only: ['mark']),
+            new Middleware('can:move correspondence', only: ['updateMovement']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

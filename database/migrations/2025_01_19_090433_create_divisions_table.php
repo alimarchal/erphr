@@ -21,8 +21,7 @@ return new class extends Migration
         });
     }
 
-
-    //$table->foreignId('reason')->constrained('users', 'id');
+    // $table->foreignId('reason')->constrained('users', 'id');
     /**
      * Reverse the migrations.
      */
