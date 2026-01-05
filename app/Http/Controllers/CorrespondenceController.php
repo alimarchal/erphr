@@ -66,10 +66,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
             ])
             ->with(['letterType', 'category', 'status', 'priority', 'currentHolder', 'toDivision', 'creator']);
 
-        // Filter by current holder if not admin/super-admin
-        if ($user->is_super_admin !== 'Yes' && ! $user->hasAnyRole(['super-admin', 'admin'])) {
-            $query->where('current_holder_id', $user->id);
-        }
+        // Apply visibility scope
+        $query->visibleTo($user);
 
         // Apply type filter if specified
         if ($type) {
@@ -213,6 +211,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
      */
     public function show(Correspondence $correspondence)
     {
+        $this->authorize('view', $correspondence);
+
         $correspondence->load([
             'letterType',
             'category',
@@ -246,6 +246,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
      */
     public function edit(Correspondence $correspondence)
     {
+        $this->authorize('update', $correspondence);
+
         return view('correspondence.edit', [
             'correspondence' => $correspondence,
             'type' => $correspondence->type,
@@ -267,6 +269,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
      */
     public function update(UpdateCorrespondenceRequest $request, Correspondence $correspondence)
     {
+        $this->authorize('update', $correspondence);
+
         DB::beginTransaction();
 
         try {
@@ -322,6 +326,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
      */
     public function destroy(Correspondence $correspondence)
     {
+        $this->authorize('delete', $correspondence);
+
         DB::beginTransaction();
 
         try {
@@ -365,6 +371,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
      */
     public function mark(Request $request, Correspondence $correspondence)
     {
+        $this->authorize('update', $correspondence);
+
         $request->validate([
             'to_user_id' => ['required', 'exists:users,id'],
             'action' => ['required', 'string'],
@@ -435,6 +443,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
      */
     public function updateMovement(Request $request, Correspondence $correspondence)
     {
+        $this->authorize('updateMovement', $correspondence);
+
         $request->validate([
             'movement_id' => ['required', 'exists:correspondence_movements,id'],
             'action' => ['required', 'in:receive,review,complete'],

@@ -198,6 +198,23 @@ class Correspondence extends Model implements HasMedia
         return $query->where('current_holder_id', $userId);
     }
 
+    public function scopeVisibleTo($query, User $user)
+    {
+        if ($user->is_super_admin === 'Yes' || $user->hasAnyRole(['super-admin', 'admin'])) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($user) {
+            $q->where('created_by', $user->id)
+                ->orWhere('current_holder_id', $user->id)
+                ->orWhere('addressed_to_user_id', $user->id)
+                ->orWhereHas('movements', function ($mq) use ($user) {
+                    $mq->where('from_user_id', $user->id)
+                        ->orWhere('to_user_id', $user->id);
+                });
+        });
+    }
+
     // Helper methods
     public function isReceipt(): bool
     {
