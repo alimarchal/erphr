@@ -276,6 +276,9 @@ class Correspondence extends Model implements HasMedia
             'current_holder_since' => now(),
         ]);
 
+        // Notify the user
+        $user->notify(new \App\Notifications\CorrespondenceMarked($this, $movement));
+
         return $movement;
     }
 

@@ -153,7 +153,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
             // Create initial movement if marked to someone
             if (! empty($data['marked_to_user_id'])) {
-                $correspondence->movements()->create([
+                $movement = $correspondence->movements()->create([
                     'from_user_id' => auth()->id(),
                     'to_user_id' => $data['marked_to_user_id'],
                     'to_division_id' => $data['to_division_id'] ?? null,
@@ -161,6 +161,12 @@ class CorrespondenceController extends Controller implements HasMiddleware
                     'instructions' => 'Initial marking upon receipt.',
                     'sequence' => 1,
                 ]);
+
+                // Notify the user
+                $toUser = User::find($data['marked_to_user_id']);
+                if ($toUser) {
+                    $toUser->notify(new \App\Notifications\CorrespondenceMarked($correspondence, $movement));
+                }
             }
 
             // Handle file attachments
