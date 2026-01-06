@@ -4,7 +4,7 @@ use App\Models\Division;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->create(['is_super_admin' => 'Yes']);
 });
 
 test('guests cannot access divisions index', function () {
