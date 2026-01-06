@@ -4,6 +4,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
+use Laravel\Fortify\Features;
 
 test('email verification screen can be rendered', function () {
     $user = User::factory()->unverified()->create();
@@ -11,7 +12,7 @@ test('email verification screen can be rendered', function () {
     $response = $this->actingAs($user)->get(route('verification.notice'));
 
     $response->assertStatus(200);
-});
+})->skip(fn () => ! Features::enabled(Features::emailVerification()));
 
 test('email can be verified', function () {
     $user = User::factory()->unverified()->create();
@@ -30,7 +31,7 @@ test('email can be verified', function () {
 
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
     $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
-});
+})->skip(fn () => ! Features::enabled(Features::emailVerification()));
 
 test('email is not verified with invalid hash', function () {
     $user = User::factory()->unverified()->create();
@@ -44,7 +45,7 @@ test('email is not verified with invalid hash', function () {
     $this->actingAs($user)->get($verificationUrl);
 
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
-});
+})->skip(fn () => ! Features::enabled(Features::emailVerification()));
 
 test('already verified user visiting verification link is redirected without firing event again', function () {
     $user = User::factory()->create([
@@ -64,4 +65,4 @@ test('already verified user visiting verification link is redirected without fir
 
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
     Event::assertNotDispatched(Verified::class);
-});
+})->skip(fn () => ! Features::enabled(Features::emailVerification()));
