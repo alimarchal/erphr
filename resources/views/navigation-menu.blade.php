@@ -16,14 +16,9 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link href="{{ route('correspondence.index', ['type' => 'Receipt']) }}"
-                        :active="request()->routeIs('correspondence.*') && request('type') === 'Receipt'">
-                        {{ __('Receipts') }}
-                    </x-nav-link>
-
-                    <x-nav-link href="{{ route('correspondence.index', ['type' => 'Dispatch']) }}"
-                        :active="request()->routeIs('correspondence.*') && request('type') === 'Dispatch'">
-                        {{ __('Dispatches') }}
+                    <x-nav-link href="{{ route('correspondence.index') }}"
+                        :active="request()->routeIs('correspondence.*')">
+                        {{ __('Correspondence') }}
                     </x-nav-link>
 
                     @can('view users')
@@ -182,14 +177,9 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link href="{{ route('correspondence.index', ['type' => 'Receipt']) }}"
-                :active="request()->routeIs('correspondence.*') && request('type') === 'Receipt'">
-                {{ __('Receipts') }}
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link href="{{ route('correspondence.index', ['type' => 'Dispatch']) }}"
-                :active="request()->routeIs('correspondence.*') && request('type') === 'Dispatch'">
-                {{ __('Dispatches') }}
+            <x-responsive-nav-link href="{{ route('correspondence.index') }}"
+                :active="request()->routeIs('correspondence.*')">
+                {{ __('Correspondence') }}
             </x-responsive-nav-link>
 
             @can('view users')
@@ -205,7 +195,8 @@
             @endcan
 
             @can('view permissions')
-                <x-responsive-nav-link href="{{ route('permissions.index') }}" :active="request()->routeIs('permissions.*')">
+                <x-responsive-nav-link href="{{ route('permissions.index') }}"
+                    :active="request()->routeIs('permissions.*')">
                     {{ __('Permissions') }}
                 </x-responsive-nav-link>
             @endcan

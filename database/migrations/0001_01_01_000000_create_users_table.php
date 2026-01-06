@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string(column: 'designation')->nullable();
+            $table->enum('is_super_admin', ['Yes', 'No'])->default('No');
+            $table->enum('is_active', ['Yes', 'No'])->default('Yes');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

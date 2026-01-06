@@ -14,7 +14,7 @@
         <div>
             <x-label for="letter_type_id" value="Letter Type" />
             <select id="letter_type_id" name="letter_type_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Type</option>
+                <option value="">None</option>
                 @foreach($letterTypes as $letterType)
                     <option value="{{ $letterType->id }}"
                         {{ old('letter_type_id', $correspondence?->letter_type_id) == $letterType->id ? 'selected' : '' }}>
@@ -27,7 +27,7 @@
         <div>
             <x-label for="category_id" value="Category" />
             <select id="category_id" name="category_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Category</option>
+                <option value="">None</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}"
                         {{ old('category_id', $correspondence?->category_id) == $category->id ? 'selected' : '' }}>
@@ -40,7 +40,7 @@
         <div>
             <x-label for="priority_id" value="Priority" />
             <select id="priority_id" name="priority_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Priority</option>
+                <option value="">None</option>
                 @foreach($priorities as $priority)
                     <option value="{{ $priority->id }}"
                         {{ old('priority_id', $correspondence?->priority_id) == $priority->id ? 'selected' : '' }}>
@@ -156,7 +156,7 @@
             <x-label for="from_division_id" value="From Division (Internal)" />
             <select id="from_division_id" name="from_division_id"
                     class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Division</option>
+                <option value="">None</option>
                 @foreach($divisions as $division)
                     <option value="{{ $division->id }}"
                         {{ old('from_division_id', $correspondence?->from_division_id) == $division->id ? 'selected' : '' }}>
@@ -171,7 +171,7 @@
             <x-label for="region_id" value="Region" />
             <select id="region_id" name="region_id"
                     class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Region</option>
+                <option value="">None</option>
                 @foreach($regions as $region)
                     <option value="{{ $region->id }}"
                         {{ old('region_id', $correspondence?->region_id) == $region->id ? 'selected' : '' }}>
@@ -185,7 +185,7 @@
             <x-label for="branch_id" value="Branch" />
             <select id="branch_id" name="branch_id"
                     class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Branch</option>
+                <option value="">None</option>
                 @foreach($branches as $branch)
                     <option value="{{ $branch->id }}"
                         data-region="{{ $branch->region_id }}"
@@ -232,15 +232,28 @@
         }
     @endphp
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <x-label for="marked_to_user_id" value="Marked to" />
+            <select id="marked_to_user_id" name="marked_to_user_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <option value="">None</option>
+                @foreach($users as $user)
+                    <option value="{{ $user->id }}"
+                        {{ old('marked_to_user_id', $correspondence?->marked_to_user_id) == $user->id ? 'selected' : '' }}>
+                        {{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
         <div>
             <x-label for="addressed_to_user_id" value="Addressed To" />
             <select id="addressed_to_user_id" name="addressed_to_user_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Person</option>
+                <option value="">None</option>
                 @foreach($users as $user)
                     <option value="{{ $user->id }}"
                         {{ old('addressed_to_user_id', $correspondence?->addressed_to_user_id) == $user->id ? 'selected' : '' }}>
-                        {{ $user->name }}
+                        {{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}
                     </option>
                 @endforeach
             </select>
@@ -249,7 +262,7 @@
         <div>
             <x-label for="initial_action" value="Action Required" />
             <select id="initial_action" name="initial_action" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Action</option>
+                <option value="">None</option>
                 <option value="Mark" {{ old('initial_action', $correspondence?->initial_action) === 'Mark' ? 'selected' : '' }}>Mark</option>
                 <option value="ForAction" {{ old('initial_action', $correspondence?->initial_action) === 'ForAction' ? 'selected' : '' }}>For Action</option>
                 <option value="ForComments" {{ old('initial_action', $correspondence?->initial_action) === 'ForComments' ? 'selected' : '' }}>For Comments</option>
@@ -278,7 +291,7 @@
         <div>
             <x-label for="delivery_mode" value="Delivery Mode" />
             <select id="delivery_mode" name="delivery_mode" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select Mode</option>
+                <option value="">None</option>
                 <option value="Hand" {{ old('delivery_mode', $correspondence?->delivery_mode) === 'Hand' ? 'selected' : '' }}>By Hand</option>
                 <option value="Courier" {{ old('delivery_mode', $correspondence?->delivery_mode) === 'Courier' ? 'selected' : '' }}>Courier</option>
                 <option value="Post" {{ old('delivery_mode', $correspondence?->delivery_mode) === 'Post' ? 'selected' : '' }}>Post</option>

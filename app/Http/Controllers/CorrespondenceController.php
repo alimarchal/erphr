@@ -55,6 +55,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 AllowedFilter::exact('category_id'),
                 AllowedFilter::partial('sender_name'),
                 AllowedFilter::exact('current_holder_id'),
+                AllowedFilter::exact('marked_to_user_id'),
                 AllowedFilter::exact('addressed_to_user_id'),
                 AllowedFilter::exact('to_division_id'),
                 AllowedFilter::exact('confidentiality'),
@@ -89,7 +90,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'divisions' => Division::orderBy('name')->get(),
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
-            'users' => User::orderBy('name')->get(['id', 'name']),
+            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
         ]);
     }
 
@@ -111,7 +112,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'divisions' => Division::orderBy('name')->get(),
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
-            'users' => User::orderBy('name')->get(['id', 'name']),
+            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
         ]);
     }
 
@@ -142,19 +143,19 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 $data['status_id'] = $initialStatus?->id;
             }
 
-            // Set current holder to addressed user if provided
-            if (! empty($data['addressed_to_user_id'])) {
-                $data['current_holder_id'] = $data['addressed_to_user_id'];
+            // Set current holder to marked user if provided
+            if (! empty($data['marked_to_user_id'])) {
+                $data['current_holder_id'] = $data['marked_to_user_id'];
                 $data['current_holder_since'] = now();
             }
 
             $correspondence = Correspondence::create($data);
 
-            // Create initial movement if addressed to someone
-            if (! empty($data['addressed_to_user_id'])) {
+            // Create initial movement if marked to someone
+            if (! empty($data['marked_to_user_id'])) {
                 $correspondence->movements()->create([
                     'from_user_id' => auth()->id(),
-                    'to_user_id' => $data['addressed_to_user_id'],
+                    'to_user_id' => $data['marked_to_user_id'],
                     'to_division_id' => $data['to_division_id'] ?? null,
                     'action' => $data['initial_action'] ?? 'Mark',
                     'instructions' => 'Initial marking upon receipt.',
@@ -237,7 +238,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
         return view('correspondence.show', [
             'correspondence' => $correspondence,
-            'users' => User::orderBy('name')->get(['id', 'name']),
+            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
         ]);
     }
 
@@ -260,7 +261,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'divisions' => Division::orderBy('name')->get(),
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
-            'users' => User::orderBy('name')->get(['id', 'name']),
+            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
         ]);
     }
 

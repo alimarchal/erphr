@@ -109,8 +109,14 @@ return new class extends Migration
             $table->uuid('from_division_id')->nullable();
             $table->uuid('to_division_id')->nullable();
 
-            // Specific person addressed
+            // Regional tracking
+            $table->foreignId('region_id')->nullable()->constrained('regions')->nullOnDelete();
+            $table->foreignId('branch_id')->nullable()->constrained('branches')->nullOnDelete();
+
+            // Assignment and tracking
+            $table->foreignId('marked_to_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('addressed_to_user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('initial_action', 100)->nullable();
 
             // Status & Priority
             $table->foreignId('status_id')->nullable()->constrained('correspondence_statuses')->nullOnDelete();
@@ -146,6 +152,10 @@ return new class extends Migration
             $table->userTracking();
             $table->softDeletes();
             $table->timestamps();
+
+            // Additional indexes
+            $table->index('region_id');
+            $table->index('branch_id');
 
             // Foreign keys for division UUIDs
             $table->foreign('from_division_id')->references('id')->on('divisions')->nullOnDelete();

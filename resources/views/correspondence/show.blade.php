@@ -116,6 +116,9 @@
                                 <dt class="text-gray-500">Division:</dt>
                                 <dd class="font-bold text-gray-900">{{ $correspondence->toDivision?->name ?? '-' }}</dd>
 
+                                <dt class="text-gray-500">Marked to:</dt>
+                                <dd class="font-bold text-gray-900">{{ $correspondence->markedTo?->name ?? '-' }}</dd>
+
                                 <dt class="text-gray-500">Addressed To:</dt>
                                 <dd class="font-bold text-gray-900">{{ $correspondence->addressedTo?->name ?? '-' }}</dd>
 

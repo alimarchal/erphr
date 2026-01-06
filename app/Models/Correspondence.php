@@ -40,6 +40,7 @@ class Correspondence extends Model implements HasMedia
         'to_division_id',
         'region_id',
         'branch_id',
+        'marked_to_user_id',
         'addressed_to_user_id',
         'initial_action',
         'status_id',
@@ -118,6 +119,11 @@ class Correspondence extends Model implements HasMedia
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function markedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'marked_to_user_id');
     }
 
     public function addressedTo(): BelongsTo
