@@ -204,170 +204,155 @@
 
     <x-data-table :items="$correspondences" :headers="[
         ['label' => 'S.No', 'align' => 'text-center'],
+        ['label' => 'Date'],
         ['label' => 'Register No.'],
-        ['label' => 'Date / Pending'],
-        ['label' => 'Subject & Category'],
-        ['label' => 'Source / Destination'],
+        ['label' => 'Subject'],
+        ['label' => 'From/To'],
+        ['label' => 'Confidentiality', 'align' => 'text-center'],
+        ['label' => 'Priority', 'align' => 'text-center'],
+        ['label' => 'Status', 'align' => 'text-center'],
         ['label' => 'Current Holder'],
-        ['label' => 'Status & Priority', 'align' => 'text-center'],
         ['label' => 'Actions', 'align' => 'text-center'],
     ]" emptyMessage="No correspondence found." :emptyRoute="route('correspondence.create', ['type' => 'Receipt'])"
         emptyLinkText="Create one">
         @foreach ($correspondences as $index => $item)
         <tr class="border-b border-gray-200 text-sm hover:bg-gray-50 {{ $item->isOverdue() ? 'bg-red-50' : '' }}">
             {{-- S.No --}}
-            <td class="py-2 px-2 text-center text-xs text-gray-500">
+            <td class="py-2 px-2 text-center">
                 {{ $correspondences->firstItem() + $index }}
             </td>
 
-            {{-- Register No. & Type --}}
-            <td class="py-2 px-2">
-                <div class="flex flex-col gap-1">
-                    <span class="inline-flex items-center w-fit px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider {{ $item->type === 'Receipt' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-purple-100 text-purple-800 border border-purple-200' }}">
-                        {{ $item->type }}
-                    </span>
-                    <a href="{{ route('correspondence.show', $item) }}" class="text-blue-600 hover:underline font-bold text-sm">
-                        {{ $item->register_number }}
-                    </a>
-                </div>
-            </td>
-
-            {{-- Date & Pending --}}
+            {{-- Date --}}
             <td class="py-2 px-2 whitespace-nowrap">
-                <div class="font-bold text-gray-900">
-                    {{ $item->type === 'Receipt' ? $item->received_date?->format('d/m/Y') : $item->dispatch_date?->format('d/m/Y') }}
-                </div>
-                
-                @php
-                    $pendingDays = 0;
-                    if (!$item->closed_at) {
-                        $startDate = $item->received_date ?? $item->created_at;
-                        $pendingDays = (int) now()->diffInDays($startDate);
-                    }
-                @endphp
-
-                @if(!$item->closed_at)
-                    <div class="flex flex-col gap-0.5 mt-1">
-                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border w-fit {{ $pendingDays > 7 ? 'bg-red-50 text-red-700 border-red-100' : ($pendingDays > 3 ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : 'bg-green-50 text-green-700 border-green-100') }}">
-                            {{ $pendingDays }} {{ Str::plural('Day', $pendingDays) }} Pending
-                        </span>
-                        @if($item->due_date)
-                            <div class="text-[9px] {{ $item->due_date->isPast() ? 'text-red-600 font-bold' : 'text-gray-500' }}">
-                                Due: {{ $item->due_date->format('d/m') }}
-                            </div>
-                        @endif
-                    </div>
-                @else
-                    <span class="text-[9px] text-gray-400 italic font-medium">Closed</span>
+                {{ $item->type === 'Receipt' ? $item->received_date?->format('d-m-Y') : $item->dispatch_date?->format('d-m-Y') }}
+                @if($item->letter_date)
+                    <div class="text-xs text-gray-500">Letter: {{ $item->letter_date->format('d-m-Y') }}</div>
                 @endif
             </td>
 
-            {{-- Subject & Category --}}
+            {{-- Register No. --}}
+            <td class="py-2 px-2">
+                <a href="{{ route('correspondence.show', $item) }}" class="text-blue-600 hover:underline font-medium">
+                    {{ $item->register_number }}
+                </a>
+                @if($item->letterType)
+                    <div class="text-xs font-semibold text-gray-600">{{ $item->letterType->name }}</div>
+                @endif
+                @if($item->reference_number)
+                    <div class="text-xs text-gray-500">Ref: {{ $item->reference_number }}</div>
+                @endif
+            </td>
+
+            {{-- Subject --}}
             <td class="py-2 px-2 max-w-xs">
-                <div class="flex items-start gap-2">
-                    <div title="{{ $item->subject }}" class="font-medium text-gray-900 flex-1 leading-tight">{{ Str::limit($item->subject, 60) }}</div>
-                    @if($item->hasMedia('attachments'))
-                        <div class="flex items-center text-gray-400 shrink-0" title="{{ $item->getMedia('attachments')->count() }} attachment(s)">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                            </svg>
-                            <span class="text-[10px] ml-0.5">{{ $item->getMedia('attachments')->count() }}</span>
-                        </div>
-                    @endif
-                </div>
-                <div class="flex flex-wrap gap-1 mt-1.5">
+                <div title="{{ $item->subject }}">{{ Str::limit($item->subject, 50) }}</div>
+                <div class="flex flex-wrap gap-1 mt-1">
                     @if($item->category)
-                        <span class="text-[9px] px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded border border-gray-200 font-bold uppercase tracking-tighter">
+                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded border border-gray-200">
                             {{ $item->category->name }}
                         </span>
                     @endif
                     @if($item->initial_action)
-                        <span class="text-[9px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100 font-medium">
-                            {{ $item->initial_action }}
-                        </span>
-                    @endif
-                    @if($item->is_replied)
-                        <span class="text-[9px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-medium">
-                            Replied
+                        <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100">
+                            Marking: {{ $item->initial_action }}
                         </span>
                     @endif
                 </div>
             </td>
 
-            {{-- Source/Destination --}}
+            {{-- From/To --}}
             <td class="py-2 px-2">
-                <div class="flex flex-col gap-0.5">
-                    @if($item->sender_name)
-                        <div class="font-semibold text-gray-900 leading-tight">{{ Str::limit($item->sender_name, 35) }}</div>
-                    @endif
+                @if($item->sender_name)
+                    {{ Str::limit($item->sender_name, 30) }}
+                @elseif($item->type === 'Receipt' && $item->fromDivision)
+                    {{ $item->fromDivision->short_name }}
+                @elseif($item->type === 'Dispatch' && $item->toDivision)
+                    {{ $item->toDivision->short_name }}
+                @else
+                    -
+                @endif
+            </td>
 
-                    <div class="flex flex-wrap gap-x-2 gap-y-0.5 text-[10px] text-gray-500 font-medium">
-                        @if($item->type === 'Receipt' && $item->fromDivision)
-                            <span class="bg-gray-50 px-1 rounded border border-gray-100">From: {{ $item->fromDivision->short_name }}</span>
-                        @elseif($item->type === 'Dispatch' && $item->toDivision)
-                            <span class="bg-gray-50 px-1 rounded border border-gray-100">To: {{ $item->toDivision->short_name }}</span>
-                        @endif
-                    </div>
-                </div>
+            {{-- Confidentiality --}}
+            <td class="py-2 px-2 text-center">
+                @if($item->confidentiality)
+                    <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full
+                        {{ $item->confidentiality === 'Normal' ? 'bg-gray-100 text-gray-700' : '' }}
+                        {{ $item->confidentiality === 'Confidential' ? 'bg-blue-100 text-blue-700' : '' }}
+                        {{ $item->confidentiality === 'Secret' ? 'bg-orange-100 text-orange-700' : '' }}
+                        {{ $item->confidentiality === 'TopSecret' ? 'bg-red-100 text-red-700' : '' }}">
+                        {{ $item->confidentiality }}
+                    </span>
+                @else
+                    -
+                @endif
+            </td>
+
+            {{-- Priority --}}
+            <td class="py-2 px-2 text-center">
+                @if($item->priority)
+                    <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full
+                        {{ $item->priority->color === 'red' ? 'bg-red-100 text-red-700' : '' }}
+                        {{ $item->priority->color === 'orange' ? 'bg-orange-100 text-orange-700' : '' }}
+                        {{ $item->priority->color === 'yellow' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                        {{ $item->priority->color === 'green' ? 'bg-green-100 text-green-700' : '' }}">
+                        {{ $item->priority->name }}
+                    </span>
+                @else
+                    -
+                @endif
+            </td>
+
+            {{-- Status --}}
+            <td class="py-2 px-2 text-center">
+                @if($item->status)
+                    <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full
+                        {{ $item->status->color === 'blue' ? 'bg-blue-100 text-blue-700' : '' }}
+                        {{ $item->status->color === 'yellow' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                        {{ $item->status->color === 'green' ? 'bg-green-100 text-green-700' : '' }}
+                        {{ $item->status->color === 'gray' ? 'bg-gray-100 text-gray-700' : '' }}
+                        {{ $item->status->color === 'purple' ? 'bg-purple-100 text-purple-700' : '' }}
+                        {{ $item->status->color === 'orange' ? 'bg-orange-100 text-orange-700' : '' }}
+                        {{ $item->status->color === 'indigo' ? 'bg-indigo-100 text-indigo-700' : '' }}
+                        {{ $item->status->color === 'teal' ? 'bg-teal-100 text-teal-700' : '' }}">
+                        {{ $item->status->name }}
+                    </span>
+                @else
+                    -
+                @endif
             </td>
 
             {{-- Current Holder --}}
             <td class="py-2 px-2">
-                <div class="font-bold text-gray-900 leading-tight">{{ $item->currentHolder?->name ?? '-' }}</div>
+                <div class="font-semibold text-gray-900">{{ $item->currentHolder?->name ?? '-' }}</div>
                 @if($item->toDivision)
-                    <div class="text-[9px] text-gray-500 uppercase tracking-wider font-bold mt-0.5">{{ $item->toDivision->short_name }}</div>
+                    <div class="text-xs text-gray-500">{{ $item->toDivision->short_name }}</div>
                 @endif
-            </td>
-
-            {{-- Status & Priority --}}
-            <td class="py-2 px-2 text-center">
-                <div class="flex flex-col items-center gap-1">
-                    @if($item->status)
-                        <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full border
-                            {{ $item->status->color === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-100' : '' }}
-                            {{ $item->status->color === 'yellow' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : '' }}
-                            {{ $item->status->color === 'green' ? 'bg-green-50 text-green-700 border-green-100' : '' }}
-                            {{ $item->status->color === 'gray' ? 'bg-gray-50 text-gray-700 border-gray-100' : '' }}
-                            {{ $item->status->color === 'purple' ? 'bg-purple-50 text-purple-700 border-purple-100' : '' }}
-                            {{ $item->status->color === 'orange' ? 'bg-orange-50 text-orange-700 border-orange-100' : '' }}
-                            {{ $item->status->color === 'indigo' ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : '' }}
-                            {{ $item->status->color === 'teal' ? 'bg-teal-50 text-teal-700 border-teal-100' : '' }}">
-                            {{ $item->status->name }}
-                        </span>
-                    @endif
-                    
-                    @if($item->priority)
-                        <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded border uppercase tracking-tighter
-                            {{ $item->priority->color === 'red' ? 'bg-red-50 text-red-700 border-red-100' : '' }}
-                            {{ $item->priority->color === 'orange' ? 'bg-orange-50 text-orange-700 border-orange-100' : '' }}
-                            {{ $item->priority->color === 'yellow' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : '' }}
-                            {{ $item->priority->color === 'green' ? 'bg-green-50 text-green-700 border-green-100' : '' }}">
-                            {{ $item->priority->name }}
-                        </span>
-                    @endif
-                </div>
+                @if($item->due_date)
+                    <div class="text-xs {{ $item->isOverdue() ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
+                        Due: {{ $item->due_date->format('d-m-Y') }}
+                    </div>
+                @endif
             </td>
 
             {{-- Actions --}}
             <td class="py-2 px-2 text-center">
                 <div class="flex justify-center space-x-1">
                     <a href="{{ route('correspondence.show', $item) }}"
-                        class="inline-flex items-center justify-center w-7 h-7 text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
-                        title="View Details">
+                        class="inline-flex items-center justify-center w-7 h-7 text-blue-600 hover:bg-blue-100 rounded-md"
+                        title="View">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                     </a>
-                    @can('edit correspondence')
                     <a href="{{ route('correspondence.edit', $item) }}"
-                        class="inline-flex items-center justify-center w-7 h-7 text-green-600 hover:bg-green-100 rounded-md transition-colors"
+                        class="inline-flex items-center justify-center w-7 h-7 text-green-600 hover:bg-green-100 rounded-md"
                         title="Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                     </a>
-                    @endcan
                 </div>
             </td>
         </tr>
