@@ -213,7 +213,7 @@ class Correspondence extends Model implements HasMedia
         return $query->where(function ($q) use ($user) {
             $q->where('created_by', $user->id)
                 ->orWhere('current_holder_id', $user->id)
-                ->orWhere('addressed_to_user_id', $user->id)
+                ->orWhere('marked_to_user_id', $user->id)
                 ->orWhereHas('movements', function ($mq) use ($user) {
                     $mq->where('from_user_id', $user->id)
                         ->orWhere('to_user_id', $user->id);

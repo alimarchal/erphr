@@ -38,7 +38,7 @@ class CorrespondencePolicy
 
         return $correspondence->created_by === $user->id ||
                $correspondence->current_holder_id === $user->id ||
-               $correspondence->addressed_to_user_id === $user->id ||
+               $correspondence->marked_to_user_id === $user->id ||
                $correspondence->movements()->where(function ($q) use ($user) {
                    $q->where('from_user_id', $user->id)
                        ->orWhere('to_user_id', $user->id);
