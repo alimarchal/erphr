@@ -50,6 +50,7 @@ class UserController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'designation' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
             'is_super_admin' => 'required|in:Yes,No',
@@ -68,6 +69,7 @@ class UserController extends Controller implements HasMiddleware
 
         $user = User::create([
             'name' => $request->name,
+            'designation' => $request->designation,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'is_super_admin' => $isSuperAdmin,
@@ -117,6 +119,7 @@ class UserController extends Controller implements HasMiddleware
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'designation' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:8',
             'is_super_admin' => 'required|in:Yes,No',
@@ -135,6 +138,7 @@ class UserController extends Controller implements HasMiddleware
 
         $updateData = [
             'name' => $request->name,
+            'designation' => $request->designation,
             'email' => $request->email,
             'is_super_admin' => $isSuperAdmin,
             'is_active' => $request->is_active,

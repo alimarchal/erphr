@@ -29,6 +29,13 @@
                     </div>
 
                     <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300">Designation:</label>
+                        <input type="text" name="designation" value="{{ old('designation', $user->designation) }}" 
+                            class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                        @error('designation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-4">
                         <label class="block text-gray-700 dark:text-gray-300">Email:</label>
                         <input type="email" name="email" value="{{ old('email', $user->email) }}" 
                             class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>

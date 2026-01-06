@@ -124,6 +124,7 @@
                             <thead>
                                 <tr class="bg-blue-800 text-white uppercase text-sm">
                                     <th class="py-2 px-4 text-center">Name</th>
+                                    <th class="py-2 px-4 text-center">Designation</th>
                                     <th class="py-2 px-4 text-center">Email</th>
                                     <th class="py-2 px-4 text-center">Roles</th>
                                     <th class="py-2 px-4 text-center">Individual Permissions</th>
@@ -142,6 +143,7 @@
                                                 <span class="block text-[10px] text-red-600 font-bold uppercase">Super Admin</span>
                                             @endif
                                         </td>
+                                        <td class="py-1 px-4 text-center">{{ $user->designation ?? 'N/A' }}</td>
                                         <td class="py-1 px-4 text-center">{{ $user->email }}</td>
                                         <td class="py-1 px-4 text-center">
                                             @foreach($user->roles as $role)
