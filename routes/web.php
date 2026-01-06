@@ -57,6 +57,8 @@ Route::middleware(['auth'])->group(function () {
         // Marking and movement actions
         Route::post('/{correspondence}/mark', [CorrespondenceController::class, 'mark'])->name('mark');
         Route::post('/{correspondence}/movement', [CorrespondenceController::class, 'updateMovement'])->name('movement.update');
+        Route::post('/{correspondence}/status', [CorrespondenceController::class, 'updateStatus'])->name('status.update');
+        Route::post('/{correspondence}/comment', [CorrespondenceController::class, 'addComment'])->name('comment.add');
     });
 });
 

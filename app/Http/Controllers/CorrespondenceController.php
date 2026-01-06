@@ -239,6 +239,10 @@ class CorrespondenceController extends Controller implements HasMiddleware
         return view('correspondence.show', [
             'correspondence' => $correspondence,
             'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
+            'statuses' => CorrespondenceStatus::active()
+                ->where(function ($q) use ($correspondence) {
+                    $q->where('type', $correspondence->type)->orWhere('type', 'Both');
+                })->ordered()->get(),
         ]);
     }
 
@@ -478,6 +482,90 @@ class CorrespondenceController extends Controller implements HasMiddleware
             ]);
 
             return back()->with('error', 'Failed to update movement. Please try again.');
+        }
+    }
+
+    /**
+     * Update correspondence status independently.
+     */
+    public function updateStatus(Request $request, Correspondence $correspondence)
+    {
+        $this->authorize('updateMovement', $correspondence);
+
+        $request->validate([
+            'status_id' => ['required', 'exists:correspondence_statuses,id'],
+            'remarks' => ['nullable', 'string'],
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $oldStatus = $correspondence->status?->name ?? 'None';
+            $correspondence->update(['status_id' => $request->status_id]);
+            $correspondence->refresh();
+            $newStatus = $correspondence->status->name;
+
+            // Create a movement log for status change
+            $correspondence->movements()->create([
+                'from_user_id' => auth()->id(),
+                'to_user_id' => auth()->id(),
+                'action' => 'Status Update',
+                'instructions' => "Changed status from '{$oldStatus}' to '{$newStatus}'".($request->remarks ? ". Note: {$request->remarks}" : ''),
+                'status' => 'Actioned', // Mark as completed log
+                'sequence' => ($correspondence->movements()->max('sequence') ?? 0) + 1,
+                'action_taken' => 'Status changed',
+                'action_taken_at' => now(),
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('correspondence.show', $correspondence)
+                ->with('success', 'Correspondence status updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error updating status', [
+                'correspondence_id' => $correspondence->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Failed to update status.');
+        }
+    }
+
+    /**
+     * Add a comment to the latest movement.
+     */
+    public function addComment(Request $request, Correspondence $correspondence)
+    {
+        $this->authorize('view', $correspondence);
+
+        $request->validate([
+            'comment' => ['required', 'string'],
+        ]);
+
+        try {
+            $latestMovement = $correspondence->movements()->latest()->first();
+
+            if (! $latestMovement) {
+                return back()->with('error', 'No movement found to attach comment.');
+            }
+
+            $latestMovement->comments()->create([
+                'user_id' => auth()->id(),
+                'comment' => $request->comment,
+            ]);
+
+            return redirect()
+                ->route('correspondence.show', $correspondence)
+                ->with('success', 'Comment added successfully.');
+        } catch (\Throwable $e) {
+            Log::error('Error adding comment', [
+                'correspondence_id' => $correspondence->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Failed to add comment.');
         }
     }
 }

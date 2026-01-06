@@ -188,6 +188,67 @@
                 </div>
             </div>
 
+            {{-- Quick Actions: Status & Comment --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {{-- Status Update Card --}}
+                <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden border border-blue-100 h-full">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Update Status
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <form action="{{ route('correspondence.status.update', $correspondence) }}" method="POST">
+                            @csrf
+                            <div class="flex items-end gap-3">
+                                <div class="flex-grow">
+                                    <x-label for="quick_status_id" value="Select Status" class="text-xs font-semibold text-gray-500 mb-1" />
+                                    <select id="quick_status_id" name="status_id" required class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                        <option value="">Choose status...</option>
+                                        @foreach($statuses as $status)
+                                            <option value="{{ $status->id }}" {{ $correspondence->status_id == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-700 transition shadow-sm h-[38px]">
+                                    Update
+                                </button>
+                            </div>
+                            <div class="mt-3">
+                                <x-label for="status_remarks" value="Add optional note to timeline" class="text-[10px] font-semibold text-gray-400 mb-1 uppercase tracking-wider" />
+                                <input type="text" id="status_remarks" name="remarks" placeholder="Explain the reason for status change (optional)..." class="block w-full border-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- Quick Comment Card --}}
+                <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden border border-gray-100 h-full">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                            Add Quick Comment
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <form action="{{ route('correspondence.comment.add', $correspondence) }}" method="POST" class="flex gap-4">
+                            @csrf
+                            <div class="flex-grow">
+                                <input type="text" name="comment" required placeholder="Type your comment here..." class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                            </div>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-indigo-700 transition shadow-sm">
+                                Post
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {{-- Movement Trail with Tabs --}}
                 <div class="lg:col-span-2" x-data="{ activeTab: 'timeline' }">
@@ -224,121 +285,129 @@
 
                         <div class="p-6">
                             {{-- Timeline Tab --}}
-                            <div x-show="activeTab === 'timeline'" class="space-y-6">
+                            <div x-show="activeTab === 'timeline'" class="space-y-0">
                                 @if($correspondence->movements->count() > 0)
-                                    <div class="space-y-6">
-                                        @foreach($correspondence->movements as $movement)
-                                            <div class="relative pl-8 pb-2 border-l-2 {{ $loop->last ? 'border-transparent' : 'border-gray-200' }}">
-                                                {{-- Timeline Dot --}}
-                                                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 border-white shadow-sm
-                                                    {{ $movement->status === 'Pending' ? 'bg-yellow-400' : ($movement->status === 'Actioned' ? 'bg-green-500' : 'bg-blue-500') }}">
-                                                </div>
+                                    <div class="relative">
+                                        {{-- Vertical Connector Line --}}
+                                        <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-200"></div>
 
-                                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-                                                    <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
-                                                        <div>
-                                                            <span class="text-xs font-bold text-blue-800 uppercase tracking-widest">#{{ $movement->sequence }} - {{ $movement->action }}</span>
-                                                            <div class="text-sm font-bold text-gray-900 mt-1">
-                                                                {{ $movement->fromUser?->name ?? 'System' }} 
-                                                                <span class="text-gray-400 font-normal mx-2">→</span> 
-                                                                {{ $movement->toUser?->name ?? '-' }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="text-right">
-                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
-                                                                {{ $movement->status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                                                {{ $movement->status === 'Received' ? 'bg-blue-100 text-blue-800' : '' }}
-                                                                {{ $movement->status === 'Reviewed' ? 'bg-indigo-100 text-indigo-800' : '' }}
-                                                                {{ $movement->status === 'Actioned' ? 'bg-green-100 text-green-800' : '' }}">
-                                                                {{ $movement->status }}
-                                                            </span>
-                                                            <div class="text-[10px] text-gray-400 mt-1 font-medium">{{ $movement->created_at->format('d-M-Y H:i') }}</div>
-                                                        </div>
+                                        <div class="space-y-8">
+                                            @foreach($correspondence->movements->sortByDesc('created_at') as $movement)
+                                                <div class="relative pl-12">
+                                                    {{-- Timeline Pulse/Dot --}}
+                                                    <div class="absolute left-[10px] top-1 w-3 h-3 rounded-full border-2 border-white ring-2 ring-offset-2 
+                                                        {{ $movement->status === 'Pending' ? 'bg-yellow-400 ring-yellow-400' : '' }}
+                                                        {{ $movement->status === 'Received' ? 'bg-blue-500 ring-blue-500' : '' }}
+                                                        {{ $movement->status === 'Reviewed' ? 'bg-indigo-500 ring-indigo-500' : '' }}
+                                                        {{ $movement->status === 'Actioned' ? 'bg-green-500 ring-green-500' : '' }}
+                                                        shadow-sm">
                                                     </div>
 
-                                                    @if($movement->instructions)
-                                                        <div class="text-sm text-gray-700 bg-white p-3 rounded border border-gray-100 italic mb-3">
-                                                            "{{ $movement->instructions }}"
-                                                        </div>
-                                                    @endif
-
-                                                    <div class="flex flex-wrap items-center gap-4 text-xs">
-                                                        @if($movement->expected_response_date)
-                                                            <div class="flex items-center {{ $movement->expected_response_date < now() && $movement->status === 'Pending' ? 'text-red-600 font-bold' : 'text-gray-500' }}">
-                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                                </svg>
-                                                                Reply by: {{ $movement->expected_response_date->format('d-M-Y') }}
-                                                                @if($movement->status === 'Pending')
-                                                                    ({{ $movement->expected_response_date->diffForHumans() }})
-                                                                @endif
+                                                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden transition-all hover:shadow-md">
+                                                        {{-- Header of Movement Card --}}
+                                                        <div class="px-5 py-3 border-b border-gray-50 flex items-center justify-between
+                                                            {{ $movement->status === 'Pending' ? 'bg-yellow-50/30' : '' }}
+                                                            {{ $movement->status === 'Actioned' ? 'bg-green-50/30' : '' }}">
+                                                            <div class="flex items-center gap-3">
+                                                                <div class="hidden sm:flex w-8 h-8 rounded-full bg-blue-100 items-center justify-center text-blue-700 text-xs font-bold">
+                                                                    {{ strtoupper(substr($movement->fromUser?->name ?? 'S', 0, 1)) }}
+                                                                </div>
+                                                                <div>
+                                                                    <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                                                                        {{ $movement->action }} <span class="mx-1 text-gray-300">|</span> Seq #{{ $movement->sequence }}
+                                                                    </div>
+                                                                    <div class="text-sm font-bold text-gray-900 leading-tight">
+                                                                        {{ $movement->fromUser?->name ?? 'System' }}
+                                                                        <span class="text-gray-400 font-normal mx-1">→</span>
+                                                                        {{ $movement->toUser?->name ?? 'Everyone' }}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        @endif
-
-                                                        @if($movement->is_urgent)
-                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 border border-red-200">
-                                                                URGENT
-                                                            </span>
-                                                        @endif
-                                                    </div>
-
-                                                    {{-- Action buttons for pending movements --}}
-                                                    @if($movement->isPending() && $movement->to_user_id === auth()->id())
-                                                        <div class="mt-4 flex space-x-2">
-                                                            <form method="POST" action="{{ route('correspondence.movement.update', $correspondence) }}" class="inline">
-                                                                @csrf
-                                                                <input type="hidden" name="movement_id" value="{{ $movement->id }}">
-                                                                <input type="hidden" name="action" value="receive">
-                                                                <button type="submit" class="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                                                                    Mark Received
-                                                                </button>
-                                                            </form>
+                                                            <div class="text-right">
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
+                                                                    {{ $movement->status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                                                    {{ $movement->status === 'Received' ? 'bg-blue-100 text-blue-800' : '' }}
+                                                                    {{ $movement->status === 'Reviewed' ? 'bg-indigo-100 text-indigo-800' : '' }}
+                                                                    {{ $movement->status === 'Actioned' ? 'bg-green-100 text-green-800 border border-green-200' : '' }}">
+                                                                    {{ $movement->status }}
+                                                                </span>
+                                                                <div class="text-[10px] text-gray-400 mt-1 font-medium">{{ $movement->created_at->format('d-M-Y H:i') }}</div>
+                                                            </div>
                                                         </div>
-                                                    @elseif($movement->status === 'Received' && $movement->to_user_id === auth()->id())
-                                                        <div class="mt-4 flex space-x-2">
-                                                            <form method="POST" action="{{ route('correspondence.movement.update', $correspondence) }}" class="inline">
-                                                                @csrf
-                                                                <input type="hidden" name="movement_id" value="{{ $movement->id }}">
-                                                                <input type="hidden" name="action" value="review">
-                                                                <button type="submit" class="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
-                                                                    Mark Reviewed
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    @endif
 
-                                                    @if($movement->action_taken)
-                                                        <div class="mt-3 p-3 bg-green-50 rounded border border-green-100 text-sm">
-                                                            <span class="text-xs font-bold text-green-800 uppercase tracking-wider block mb-1">Action Taken:</span>
-                                                            <p class="text-gray-700">{{ $movement->action_taken }}</p>
-                                                        </div>
-                                                    @endif
-
-                                                    @if($movement->getMedia('attachments')->count() > 0)
-                                                        <div class="mt-3 pt-3 border-t border-gray-200">
-                                                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-2">Movement Attachments:</span>
-                                                            <div class="flex flex-wrap gap-2">
-                                                                @foreach($movement->getMedia('attachments') as $media)
-                                                                    <a href="{{ $media->getUrl() }}" target="_blank" 
-                                                                       class="inline-flex items-center px-2 py-1 bg-white border border-gray-200 rounded text-xs text-blue-600 hover:bg-blue-50 transition">
-                                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                        {{-- Body of Movement Card --}}
+                                                        <div class="p-5">
+                                                            @if($movement->instructions)
+                                                                <div class="flex gap-3 mb-4 last:mb-0">
+                                                                    <div class="flex-shrink-0 mt-1">
+                                                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                                                                         </svg>
-                                                                        {{ Str::limit($media->file_name, 20) }}
-                                                                    </a>
-                                                                @endforeach
-                                                            </div>
+                                                                    </div>
+                                                                    <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100 text-sm italic text-gray-700 w-full">
+                                                                        "{{ $movement->instructions }}"
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+
+                                                            @if($movement->comments->count() > 0)
+                                                                <div class="space-y-3 mt-3">
+                                                                    @foreach($movement->comments as $comment)
+                                                                        <div class="flex gap-3">
+                                                                            <div class="flex-shrink-0 mt-1">
+                                                                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                                                                                </svg>
+                                                                            </div>
+                                                                            <div class="text-sm bg-gray-50 p-3 rounded-lg border border-gray-100 w-full">
+                                                                                <div class="flex items-center justify-between mb-1">
+                                                                                    <span class="font-bold text-gray-900 text-xs">{{ $comment->user?->name }}</span>
+                                                                                    <span class="text-[10px] text-gray-400">{{ $comment->created_at->format('d-M-Y H:i') }}</span>
+                                                                                </div>
+                                                                                <p class="text-gray-700 leading-relaxed">{{ $comment->comment }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            @endif
+
+                                                            {{-- Status specific footer actions --}}
+                                                            @if($movement->isPending() && $movement->to_user_id === auth()->id())
+                                                                <div class="mt-4 pt-4 border-t border-gray-50 flex gap-2">
+                                                                    <form method="POST" action="{{ route('correspondence.movement.update', $correspondence) }}">
+                                                                        @csrf
+                                                                        <input type="hidden" name="movement_id" value="{{ $movement->id }}">
+                                                                        <input type="hidden" name="action" value="receive">
+                                                                        <button type="submit" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition shadow-sm">
+                                                                            Mark Received
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            @elseif($movement->status === 'Received' && $movement->to_user_id === auth()->id())
+                                                                <div class="mt-4 pt-4 border-t border-gray-50 flex gap-2">
+                                                                    <form method="POST" action="{{ route('correspondence.movement.update', $correspondence) }}">
+                                                                        @csrf
+                                                                        <input type="hidden" name="movement_id" value="{{ $movement->id }}">
+                                                                        <input type="hidden" name="action" value="review">
+                                                                        <button type="submit" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition shadow-sm">
+                                                                            Mark Reviewed
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            @endif
                                                         </div>
-                                                    @endif
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        @endforeach
+                                            @endforeach
+                                        </div>
                                     </div>
                                 @else
-                                    <div class="text-center py-8">
-                                        <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                        </svg>
+                                    <div class="text-center py-12">
+                                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
+                                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                            </svg>
+                                        </div>
                                         <p class="text-gray-500 font-medium">No movements recorded yet.</p>
                                     </div>
                                 @endif
@@ -550,30 +619,10 @@
                     </div>
                 </div>
 
-                {{-- Row 2: Expected Response Date & Status --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <x-label for="expected_response_date" value="Expected Response Date" />
-                        <x-input id="expected_response_date" type="date" name="expected_response_date" class="mt-1 block w-full" />
-                    </div>
-
-                    <div>
-                        <x-label for="status_id" value="Update Status (Optional)" />
-                        <select id="status_id" name="status_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                            <option value="">Keep Current Status</option>
-                            @php
-                                $markStatuses = \App\Models\CorrespondenceStatus::active()
-                                    ->where(function($q) use ($correspondence) {
-                                        $q->where('type', $correspondence->type)->orWhere('type', 'Both');
-                                    })->ordered()->get();
-                            @endphp
-                            @foreach($markStatuses as $status)
-                                <option value="{{ $status->id }}" {{ $correspondence->status_id == $status->id ? 'selected' : '' }}>
-                                    {{ $status->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                {{-- Row 2: Expected Response Date --}}
+                <div class="mb-4">
+                    <x-label for="expected_response_date" value="Expected Response Date" />
+                    <x-input id="expected_response_date" type="date" name="expected_response_date" class="mt-1 block w-full" />
                 </div>
 
                 {{-- Row 3: Instructions (Full Width) --}}
