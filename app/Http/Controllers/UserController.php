@@ -30,7 +30,7 @@ class UserController extends Controller implements HasMiddleware
             ->allowedFilters(User::getAllowedFilters())
             ->allowedSorts(User::getAllowedSorts())
             ->allowedIncludes(User::getAllowedIncludes())
-            ->with(['roles', 'permissions'])
+            ->with(['roles.permissions', 'permissions'])
             ->defaultSort('-created_at')
             ->paginate(request('per_page', 10))
             ->appends(request()->query());
@@ -97,8 +97,9 @@ class UserController extends Controller implements HasMiddleware
         $permissions = Permission::all();
         $userRoles = $user->roles->pluck('id')->toArray();
         $userPermissions = $user->permissions->pluck('id')->toArray();
+        $inheritedPermissions = $user->getPermissionsViaRoles()->pluck('id')->toArray();
 
-        return view('users.edit', compact('user', 'roles', 'permissions', 'userRoles', 'userPermissions'));
+        return view('users.edit', compact('user', 'roles', 'permissions', 'userRoles', 'userPermissions', 'inheritedPermissions'));
     }
 
     public function update(Request $request, User $user)

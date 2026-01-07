@@ -93,15 +93,30 @@
                         <label class="block text-gray-700 dark:text-gray-300 mb-3">Individual Permissions:</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
                             @foreach($permissions as $permission)
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                        {{ in_array($permission->id, old('permissions', $userPermissions)) ? 'checked' : '' }}
-                                        class="rounded border-gray-300 dark:border-gray-700 text-blue-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                    <span class="ml-2 text-gray-700 dark:text-gray-300 text-sm">{{ $permission->name }}</span>
+                                @php
+                                    $isInherited = in_array($permission->id, $inheritedPermissions);
+                                    $isDirect = in_array($permission->id, old('permissions', $userPermissions));
+                                @endphp
+                                <label class="flex items-center p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150">
+                                    <div class="relative flex items-center">
+                                        <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
+                                            {{ ($isDirect || $isInherited) ? 'checked' : '' }}
+                                            {{ $isInherited ? 'disabled' : '' }}
+                                            class="rounded border-gray-300 dark:border-gray-700 text-blue-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 {{ $isInherited ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                    </div>
+                                    <span class="ml-2 text-gray-700 dark:text-gray-300 text-sm {{ $isInherited ? 'font-semibold' : '' }}">
+                                        {{ $permission->name }}
+                                        @if($isInherited)
+                                            <span class="text-[10px] text-blue-600 bg-blue-50 px-1 rounded ml-1 border border-blue-200" title="Inherited from Role">Role</span>
+                                        @endif
+                                    </span>
                                 </label>
                             @endforeach
                         </div>
-                        <small class="text-gray-500 dark:text-gray-400 mt-2 block">Note: Individual permissions are granted in addition to role-based permissions. Unchecking a permission will revoke it from the user.</small>
+                        <small class="text-gray-500 dark:text-gray-400 mt-2 block italic text-xs">
+                            Note: Permissions marked with <span class="text-blue-600 font-bold">Role</span> are inherited from the assigned roles and cannot be removed here. 
+                            Unchecking others will revoke them from the user's individual permissions.
+                        </small>
                         @error('permissions') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 

@@ -65,6 +65,7 @@
                             Edit
                         </a>
                         @endcan
+                        @can('mark correspondence')
                         <button type="button" onclick="document.getElementById('mark-modal').classList.remove('hidden')"
                                 class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-green-700 transition">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,6 +73,7 @@
                             </svg>
                             Mark To
                         </button>
+                        @endcan
                     </div>
                 </div>
 

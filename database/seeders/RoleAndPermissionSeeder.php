@@ -73,7 +73,7 @@ class RoleAndPermissionSeeder extends Seeder
         // User
         $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
         $userRole->syncPermissions([
-            'view correspondence', 'create correspondence', 'edit correspondence', 'mark correspondence', 'move correspondence',
+            'view correspondence', 'create correspondence', 'mark correspondence', 'move correspondence',
         ]);
     }
 }

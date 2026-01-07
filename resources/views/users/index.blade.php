@@ -127,7 +127,7 @@
                                     <th class="py-2 px-4 text-center">Designation</th>
                                     <th class="py-2 px-4 text-center">Email</th>
                                     <th class="py-2 px-4 text-center">Roles</th>
-                                    <th class="py-2 px-4 text-center">Individual Permissions</th>
+                                    <th class="py-2 px-4 text-center">Permissions</th>
                                     <th class="py-2 px-4 text-center">Status</th>
                                     @can('edit users')
                                         <th class="py-2 px-4 text-center">Actions</th>
@@ -154,20 +154,26 @@
                                             @endforeach
                                         </td>
                                         <td class="py-1 px-4 text-center">
-                                            @if($user->permissions->count() > 0)
-                                                @foreach($user->permissions->take(3) as $permission)
+                                            @php
+                                                $allPermissions = $user->getAllPermissions();
+                                                $directPermissions = $user->permissions->pluck('name')->toArray();
+                                            @endphp
+                                            @if($allPermissions->count() > 0)
+                                                @foreach($allPermissions->take(5) as $permission)
                                                     <span
-                                                        class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mr-1 mb-1">
+                                                        class="inline-block {{ in_array($permission->name, $directPermissions) ? 'bg-green-100 text-green-800 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-100' }} text-[10px] px-2 py-0.5 rounded-full mr-1 mb-1 border"
+                                                        title="{{ in_array($permission->name, $directPermissions) ? 'Direct' : 'Via Role' }}">
                                                         {{ $permission->name }}
                                                     </span>
                                                 @endforeach
-                                                @if($user->permissions->count() > 3)
-                                                    <span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                                                        +{{ $user->permissions->count() - 3 }} more
+                                                @if($allPermissions->count() > 5)
+                                                    <span
+                                                        class="inline-block bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded-full border border-gray-200">
+                                                        +{{ $allPermissions->count() - 5 }} more
                                                     </span>
                                                 @endif
                                             @else
-                                                <span class="text-gray-500 text-xs">None</span>
+                                                <span class="text-gray-500 text-xs italic">None</span>
                                             @endif
                                         </td>
                                         <td class="py-1 px-4 text-center">

@@ -34,6 +34,7 @@
                 </button>
 
                 {{-- New Receipt Button --}}
+                @can('create correspondence')
                 <a href="{{ route('correspondence.create', ['type' => 'Receipt']) }}"
                     class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,8 +42,10 @@
                     </svg>
                     <span class="hidden md:inline-block">New Receipt</span>
                 </a>
+                @endcan
 
                 {{-- New Dispatch Button --}}
+                @can('create correspondence')
                 <a href="{{ route('correspondence.create', ['type' => 'Dispatch']) }}"
                     class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,6 +53,7 @@
                     </svg>
                     <span class="hidden md:inline-block">New Dispatch</span>
                 </a>
+                @endcan
 
                 {{-- Refresh Button --}}
                 <a href="javascript:window.location.reload();"
@@ -338,6 +342,7 @@
             {{-- Actions --}}
             <td class="py-2 px-2 text-center">
                 <div class="flex justify-center space-x-1">
+                    @can('view correspondence')
                     <a href="{{ route('correspondence.show', $item) }}"
                         class="inline-flex items-center justify-center w-7 h-7 text-blue-600 hover:bg-blue-100 rounded-md"
                         title="View">
@@ -346,6 +351,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                     </a>
+                    @endcan
+                    @can('edit correspondence')
                     <a href="{{ route('correspondence.edit', $item) }}"
                         class="inline-flex items-center justify-center w-7 h-7 text-green-600 hover:bg-green-100 rounded-md"
                         title="Edit">
@@ -353,6 +360,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                     </a>
+                    @endcan
                 </div>
             </td>
         </tr>
