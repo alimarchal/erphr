@@ -220,6 +220,11 @@ class CorrespondenceController extends Controller implements HasMiddleware
     {
         $this->authorize('view', $correspondence);
 
+        activity()
+            ->performedOn($correspondence)
+            ->event('viewed')
+            ->log("Viewed correspondence: {$correspondence->register_number}");
+
         $correspondence->load([
             'letterType',
             'category',
@@ -258,6 +263,11 @@ class CorrespondenceController extends Controller implements HasMiddleware
     public function edit(Correspondence $correspondence)
     {
         $this->authorize('update', $correspondence);
+
+        activity()
+            ->performedOn($correspondence)
+            ->event('access_edit_form')
+            ->log("Accessed edit form for correspondence: {$correspondence->register_number}");
 
         return view('correspondence.edit', [
             'correspondence' => $correspondence,

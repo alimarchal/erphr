@@ -38,6 +38,13 @@
                             {{ __('Permissions') }}
                         </x-nav-link>
                     @endcan
+
+                    @role('super-admin')
+                    <x-nav-link href="{{ route('admin.activity-logs') }}"
+                        :active="request()->routeIs('admin.activity-logs')">
+                        {{ __('Activity Logs') }}
+                    </x-nav-link>
+                    @endrole
                 </div>
             </div>
 
@@ -203,6 +210,13 @@
                     {{ __('Permissions') }}
                 </x-responsive-nav-link>
             @endcan
+
+            @role('super-admin')
+            <x-responsive-nav-link href="{{ route('admin.activity-logs') }}"
+                :active="request()->routeIs('admin.activity-logs')">
+                {{ __('Activity Logs') }}
+            </x-responsive-nav-link>
+            @endrole
         </div>
 
         <!-- Responsive Settings Options -->

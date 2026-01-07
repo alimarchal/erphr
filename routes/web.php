@@ -43,6 +43,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
 
+    // Admin Activity Logs
+    Volt::route('admin/activity-logs', 'admin.activity-log-viewer')
+        ->middleware(['role:super-admin'])
+        ->name('admin.activity-logs');
+
     // Correspondence Module Routes
     Route::prefix('correspondence')->name('correspondence.')->group(function () {
         // Main correspondence CRUD
