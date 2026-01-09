@@ -132,9 +132,9 @@ return new class extends Migration
             $table->string('courier_name', 255)->nullable();
             $table->string('courier_tracking', 255)->nullable();
 
-            // Linking
-            $table->foreignUuid('parent_id')->nullable()->constrained('correspondences')->nullOnDelete();
-            $table->foreignUuid('related_correspondence_id')->nullable()->constrained('correspondences')->nullOnDelete();
+            // Linking - Note: Foreign keys added below outside Schema::create for Postgres compatibility
+            $table->uuid('parent_id')->nullable();
+            $table->uuid('related_correspondence_id')->nullable();
 
             // Current holder tracking
             $table->foreignId('current_holder_id')->nullable()->constrained('users')->nullOnDelete();
@@ -172,6 +172,12 @@ return new class extends Migration
             $table->index('current_holder_id');
             $table->index(['is_replied', 'type']);
             $table->index('due_date');
+        });
+
+        // Add self-referencing foreign keys for correspondences
+        Schema::table('correspondences', function (Blueprint $table) {
+            $table->foreign('parent_id')->references('id')->on('correspondences')->nullOnDelete();
+            $table->foreign('related_correspondence_id')->references('id')->on('correspondences')->nullOnDelete();
         });
 
         // 8. Correspondence Movements - Marking trail (critical for tracking)

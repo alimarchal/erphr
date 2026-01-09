@@ -11,7 +11,11 @@ return new class extends Migration
             return;
         }
 
-        DB::statement('ALTER TABLE `media` MODIFY `model_id` CHAR(36) NOT NULL');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE media ALTER COLUMN model_id TYPE UUID USING model_id::UUID');
+        } else {
+            DB::statement('ALTER TABLE `media` MODIFY `model_id` CHAR(36) NOT NULL');
+        }
     }
 
     public function down(): void
@@ -20,6 +24,10 @@ return new class extends Migration
             return;
         }
 
-        DB::statement('ALTER TABLE `media` MODIFY `model_id` BIGINT UNSIGNED NOT NULL');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE media ALTER COLUMN model_id TYPE BIGINT USING model_id::BIGINT');
+        } else {
+            DB::statement('ALTER TABLE `media` MODIFY `model_id` BIGINT UNSIGNED NOT NULL');
+        }
     }
 };

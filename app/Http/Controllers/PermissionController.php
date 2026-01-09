@@ -6,6 +6,7 @@ use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\DB;
 
 class PermissionController extends Controller implements HasMiddleware
 {
@@ -33,11 +34,13 @@ class PermissionController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255|unique:permissions,name',
         ]);
 
-        // Create the permission
-        Permission::create([
-            'name' => $request->name,
-            'guard_name' => 'web',
-        ]);
+        DB::transaction(function () use ($request) {
+            // Create the permission
+            Permission::create([
+                'name' => $request->name,
+                'guard_name' => 'web',
+            ]);
+        });
 
         // Redirect with success message
         return redirect()->route('permissions.index')->with('success', 'Permission created successfully!');
@@ -87,11 +90,13 @@ class PermissionController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255|unique:permissions,name,'.$permission->id,
         ]);
 
-        // Update the permission
-        $permission->update([
-            'name' => $request->name,
-            'guard_name' => 'web',
-        ]);
+        DB::transaction(function () use ($permission, $request) {
+            // Update the permission
+            $permission->update([
+                'name' => $request->name,
+                'guard_name' => 'web',
+            ]);
+        });
 
         // Redirect with success message
         return redirect()->route('permissions.index')->with('success', 'Permission updated successfully!');
@@ -107,8 +112,10 @@ class PermissionController extends Controller implements HasMiddleware
             return redirect()->back()->withErrors(['permission' => 'Cannot delete critical system permission: '.$permission->name]);
         }
 
-        // Delete the permission
-        $permission->delete();
+        DB::transaction(function () use ($permission) {
+            // Delete the permission
+            $permission->delete();
+        });
 
         // Redirect with success message
         return redirect()->route('permissions.index')->with('success', 'Permission deleted successfully!');

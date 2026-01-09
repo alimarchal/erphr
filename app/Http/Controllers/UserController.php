@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -77,26 +78,28 @@ class UserController extends Controller implements HasMiddleware
             $isSuperAdmin = 'No';
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'designation' => $request->designation,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'is_super_admin' => $isSuperAdmin,
-            'is_active' => $request->is_active,
-        ]);
+        DB::transaction(function () use ($request, $isSuperAdmin) {
+            $user = User::create([
+                'name' => $request->name,
+                'designation' => $request->designation,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'is_super_admin' => $isSuperAdmin,
+                'is_active' => $request->is_active,
+            ]);
 
-        // Assign roles if provided (convert IDs to names for spatie/permission)
-        if ($request->filled('roles')) {
-            $roleNames = Role::whereIn('id', $request->roles)->pluck('name')->toArray();
-            $user->syncRoles($roleNames);
-        }
+            // Assign roles if provided (convert IDs to names for spatie/permission)
+            if ($request->filled('roles')) {
+                $roleNames = Role::whereIn('id', $request->roles)->pluck('name')->toArray();
+                $user->syncRoles($roleNames);
+            }
 
-        // Assign individual permissions if provided (convert IDs to names)
-        if ($request->filled('permissions')) {
-            $permissionNames = Permission::whereIn('id', $request->permissions)->pluck('name')->toArray();
-            $user->syncPermissions($permissionNames);
-        }
+            // Assign individual permissions if provided (convert IDs to names)
+            if ($request->filled('permissions')) {
+                $permissionNames = Permission::whereIn('id', $request->permissions)->pluck('name')->toArray();
+                $user->syncPermissions($permissionNames);
+            }
+        });
 
         return redirect()->route('users.index')->with('success', 'User created successfully with assigned roles and permissions.');
     }
@@ -160,26 +163,27 @@ class UserController extends Controller implements HasMiddleware
             $updateData['password'] = Hash::make($request->password);
         }
 
-        $user->update($updateData);
+        DB::transaction(function () use ($user, $updateData, $request) {
+            $user->update($updateData);
 
-        // Sync roles (IDs -> names) if provided, otherwise clear all roles
-        if ($request->has('roles')) {
-            $roleIds = $request->roles ?? [];
-            $roleNames = empty($roleIds) ? [] : Role::whereIn('id', $roleIds)->pluck('name')->toArray();
-            $user->syncRoles($roleNames);
-        } else {
-            // Explicitly clear roles if roles key omitted? Keep existing behavior (clear) by passing empty array
-            $user->syncRoles([]);
-        }
+            // Sync roles (IDs -> names) if provided, otherwise clear all roles
+            if ($request->has('roles')) {
+                $roleIds = $request->roles ?? [];
+                $roleNames = empty($roleIds) ? [] : Role::whereIn('id', $roleIds)->pluck('name')->toArray();
+                $user->syncRoles($roleNames);
+            } else {
+                $user->syncRoles([]);
+            }
 
-        // Sync individual permissions (IDs -> names) if provided, otherwise clear all permissions
-        if ($request->has('permissions')) {
-            $permIds = $request->permissions ?? [];
-            $permissionNames = empty($permIds) ? [] : Permission::whereIn('id', $permIds)->pluck('name')->toArray();
-            $user->syncPermissions($permissionNames);
-        } else {
-            $user->syncPermissions([]);
-        }
+            // Sync individual permissions (IDs -> names) if provided, otherwise clear all permissions
+            if ($request->has('permissions')) {
+                $permIds = $request->permissions ?? [];
+                $permissionNames = empty($permIds) ? [] : Permission::whereIn('id', $permIds)->pluck('name')->toArray();
+                $user->syncPermissions($permissionNames);
+            } else {
+                $user->syncPermissions([]);
+            }
+        });
 
         return redirect()->route('users.index')->with('success', 'User updated successfully with assigned roles and permissions.');
     }
@@ -196,7 +200,9 @@ class UserController extends Controller implements HasMiddleware
             return redirect()->back()->withErrors(['user' => 'Cannot delete the last super admin user.']);
         }
 
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            $user->delete();
+        });
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }

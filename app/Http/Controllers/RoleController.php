@@ -7,6 +7,7 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller implements HasMiddleware
 {
@@ -40,16 +41,18 @@ class RoleController extends Controller implements HasMiddleware
             'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $role = Role::create([
-            'name' => $request->name,
-            'guard_name' => $request->guard_name,
-        ]);
+        DB::transaction(function () use ($request) {
+            $role = Role::create([
+                'name' => $request->name,
+                'guard_name' => $request->guard_name,
+            ]);
 
-        // Assign permissions to the role if provided - Ensure IDs are passed as integers
-        if ($request->filled('permissions')) {
-            $permissionIds = collect($request->permissions)->map(fn ($id) => (int) $id)->toArray();
-            $role->syncPermissions($permissionIds);
-        }
+            // Assign permissions to the role if provided - Ensure IDs are passed as integers
+            if ($request->filled('permissions')) {
+                $permissionIds = collect($request->permissions)->map(fn ($id) => (int) $id)->toArray();
+                $role->syncPermissions($permissionIds);
+            }
+        });
 
         return redirect()->route('roles.index')->with('success', 'Role created successfully with assigned permissions!');
     }
@@ -103,18 +106,20 @@ class RoleController extends Controller implements HasMiddleware
             'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $role->update([
-            'name' => $request->name,
-            'guard_name' => $request->guard_name,
-        ]);
+        DB::transaction(function () use ($role, $request) {
+            $role->update([
+                'name' => $request->name,
+                'guard_name' => $request->guard_name,
+            ]);
 
-        // Sync permissions - Ensure IDs are passed as integers for Spatie to recognize them correctly
-        if ($request->has('permissions')) {
-            $permissionIds = collect($request->permissions)->map(fn ($id) => (int) $id)->toArray();
-            $role->syncPermissions($permissionIds);
-        } else {
-            $role->syncPermissions([]);
-        }
+            // Sync permissions - Ensure IDs are passed as integers for Spatie to recognize them correctly
+            if ($request->has('permissions')) {
+                $permissionIds = collect($request->permissions)->map(fn ($id) => (int) $id)->toArray();
+                $role->syncPermissions($permissionIds);
+            } else {
+                $role->syncPermissions([]);
+            }
+        });
 
         return redirect()->route('roles.index')->with('success', 'Role updated successfully with assigned permissions!');
     }
@@ -127,7 +132,9 @@ class RoleController extends Controller implements HasMiddleware
             return redirect()->back()->withErrors(['role' => 'Cannot delete super-admin role while users are assigned to it.']);
         }
 
-        $role->delete();
+        DB::transaction(function () use ($role) {
+            $role->delete();
+        });
 
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully!');
     }
