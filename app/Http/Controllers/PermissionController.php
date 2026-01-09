@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller implements HasMiddleware
 {
@@ -46,6 +46,15 @@ class PermissionController extends Controller implements HasMiddleware
     // Display a listing of the permissions with pagination
     public function index(Request $request)
     {
+        // Log the view activity
+        activity()
+            ->event('viewed_list')
+            ->withProperties([
+                'filters' => $request->get('filter', []),
+                'page' => $request->get('page', 1),
+            ])
+            ->log('Viewed permission list');
+
         $query = Permission::with('roles');
 
         // Apply filters based on request inputs

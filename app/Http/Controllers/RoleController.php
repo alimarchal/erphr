@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller implements HasMiddleware
 {
@@ -45,9 +45,10 @@ class RoleController extends Controller implements HasMiddleware
             'guard_name' => $request->guard_name,
         ]);
 
-        // Assign permissions to the role if provided
+        // Assign permissions to the role if provided - Ensure IDs are passed as integers
         if ($request->filled('permissions')) {
-            $role->syncPermissions($request->permissions);
+            $permissionIds = collect($request->permissions)->map(fn ($id) => (int) $id)->toArray();
+            $role->syncPermissions($permissionIds);
         }
 
         return redirect()->route('roles.index')->with('success', 'Role created successfully with assigned permissions!');
@@ -56,6 +57,15 @@ class RoleController extends Controller implements HasMiddleware
     // Display a listing of the roles with pagination
     public function index(Request $request)
     {
+        // Log the view activity
+        activity()
+            ->event('viewed_list')
+            ->withProperties([
+                'filters' => $request->get('filter', []),
+                'page' => $request->get('page', 1),
+            ])
+            ->log('Viewed role list');
+
         $query = Role::with('permissions');
 
         // Apply filters based on request inputs
@@ -98,8 +108,13 @@ class RoleController extends Controller implements HasMiddleware
             'guard_name' => $request->guard_name,
         ]);
 
-        // Sync permissions - this will add/remove permissions as needed
-        $role->syncPermissions($request->permissions ?? []);
+        // Sync permissions - Ensure IDs are passed as integers for Spatie to recognize them correctly
+        if ($request->has('permissions')) {
+            $permissionIds = collect($request->permissions)->map(fn ($id) => (int) $id)->toArray();
+            $role->syncPermissions($permissionIds);
+        } else {
+            $role->syncPermissions([]);
+        }
 
         return redirect()->route('roles.index')->with('success', 'Role updated successfully with assigned permissions!');
     }

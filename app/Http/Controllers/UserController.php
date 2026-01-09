@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class UserController extends Controller implements HasMiddleware
@@ -26,6 +26,16 @@ class UserController extends Controller implements HasMiddleware
 
     public function index(Request $request)
     {
+        // Log the view activity
+        activity()
+            ->event('viewed_list')
+            ->withProperties([
+                'filters' => $request->get('filter', []),
+                'sort' => $request->get('sort'),
+                'page' => $request->get('page', 1),
+            ])
+            ->log('Viewed user list');
+
         $users = QueryBuilder::for(User::class)
             ->allowedFilters(User::getAllowedFilters())
             ->allowedSorts(User::getAllowedSorts())

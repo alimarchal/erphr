@@ -13,7 +13,7 @@ class Permission extends SpatiePermission
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logFillable()
+            ->logAll()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $eventName) => "Permission has been {$eventName}");

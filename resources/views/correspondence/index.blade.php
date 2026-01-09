@@ -279,12 +279,26 @@
             {{-- From/To --}}
             <td class="py-2 px-2">
                 @if($item->sender_name)
-                    {{ Str::limit($item->sender_name, 30) }}
-                @elseif($item->type === 'Receipt' && $item->fromDivision)
-                    {{ $item->fromDivision->short_name }}
-                @elseif($item->type === 'Dispatch' && $item->toDivision)
-                    {{ $item->toDivision->short_name }}
-                @else
+                    <div class="font-medium text-gray-900">{{ Str::limit($item->sender_name, 30) }}</div>
+                @endif
+                
+                @if($item->fromDivision)
+                    <div class="text-[10px] text-gray-600 font-semibold">{{ $item->fromDivision->short_name ?? $item->fromDivision->name }}</div>
+                @endif
+
+                @if($item->toDivision)
+                    <div class="text-[10px] text-gray-600 font-semibold italic">To: {{ $item->toDivision->short_name ?? $item->toDivision->name }}</div>
+                @endif
+                
+                @if($item->region)
+                    <div class="text-[10px] text-gray-500">Reg: {{ $item->region->name }}</div>
+                @endif
+                
+                @if($item->branch)
+                    <div class="text-[10px] text-gray-500">Br: {{ $item->branch->name }}</div>
+                @endif
+
+                @if(!$item->sender_name && !$item->fromDivision && !$item->toDivision && !$item->region && !$item->branch)
                     -
                 @endif
             </td>

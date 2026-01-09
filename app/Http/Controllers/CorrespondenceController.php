@@ -76,7 +76,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 AllowedFilter::callback('received_to', fn ($query, $value) => $value ? $query->whereDate('received_date', '<=', $value) : null),
                 AllowedFilter::callback('overdue', fn ($query, $value) => $value ? $query->overdue() : null),
             ])
-            ->with(['letterType', 'category', 'status', 'priority', 'currentHolder', 'toDivision', 'fromDivision', 'creator', 'addressedTo']);
+            ->with(['letterType', 'category', 'status', 'priority', 'currentHolder', 'toDivision', 'fromDivision', 'region', 'branch', 'creator', 'addressedTo']);
 
         // Apply visibility scope
         $query->visibleTo($user);

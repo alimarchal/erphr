@@ -17,9 +17,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 
 class User extends Authenticatable
 {
-    use HasApiTokens;
-
-    // The User model requires this trait
+    // The User model requires these traits
     use HasApiTokens, HasRoles, LogsActivity, UserTracking;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
