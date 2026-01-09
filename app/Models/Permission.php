@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Permission\Models\Role as SpatieRole;
+use Spatie\Permission\Models\Permission as SpatiePermission;
 
-class Role extends SpatieRole
+class Permission extends SpatiePermission
 {
-    use HasFactory, LogsActivity;
+    use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -17,6 +16,6 @@ class Role extends SpatieRole
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $eventName) => "Role has been {$eventName}");
+            ->setDescriptionForEvent(fn (string $eventName) => "Permission has been {$eventName}");
     }
 }

@@ -77,30 +77,43 @@
                 :value="old('letter_date', $correspondence?->letter_date?->format('Y-m-d'))" />
         </div>
 
-        @if($isReceipt)
-            <div>
-                <x-label for="status_id" value="Status" />
-                <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                    <option value="">Auto (Initial)</option>
-                    @foreach($statuses as $status)
-                        <option value="{{ $status->id }}"
-                            {{ old('status_id', $correspondence?->status_id) == $status->id ? 'selected' : '' }}>
-                            {{ $status->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+        <div>
+            <x-label for="addressed_to_user_id" value="Addressed To" />
+            <select id="addressed_to_user_id" name="addressed_to_user_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <option value="">None</option>
+                @foreach($users as $user)
+                    <option value="{{ $user->id }}"
+                        {{ old('addressed_to_user_id', $correspondence?->addressed_to_user_id) == $user->id ? 'selected' : '' }}>
+                        {{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-            <div>
-                <x-label for="confidentiality" value="Confidentiality" />
-                <select id="confidentiality" name="confidentiality" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                    <option value="Normal" {{ old('confidentiality', $correspondence?->confidentiality ?? 'Normal') === 'Normal' ? 'selected' : '' }}>Normal</option>
-                    <option value="Confidential" {{ old('confidentiality', $correspondence?->confidentiality) === 'Confidential' ? 'selected' : '' }}>Confidential</option>
-                    <option value="Secret" {{ old('confidentiality', $correspondence?->confidentiality) === 'Secret' ? 'selected' : '' }}>Secret</option>
-                    <option value="TopSecret" {{ old('confidentiality', $correspondence?->confidentiality) === 'TopSecret' ? 'selected' : '' }}>Top Secret</option>
-                </select>
-            </div>
-        @endif
+        <div>
+            <x-label for="status_id" value="Status" />
+            <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <option value="">Auto (Initial)</option>
+                @foreach($statuses as $status)
+                    <option value="{{ $status->id }}"
+                        {{ old('status_id', $correspondence?->status_id) == $status->id ? 'selected' : '' }}>
+                        {{ $status->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+        <div>
+            <x-label for="confidentiality" value="Confidentiality" />
+            <select id="confidentiality" name="confidentiality" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <option value="Normal" {{ old('confidentiality', $correspondence?->confidentiality ?? 'Normal') === 'Normal' ? 'selected' : '' }}>Normal</option>
+                <option value="Confidential" {{ old('confidentiality', $correspondence?->confidentiality) === 'Confidential' ? 'selected' : '' }}>Confidential</option>
+                <option value="Secret" {{ old('confidentiality', $correspondence?->confidentiality) === 'Secret' ? 'selected' : '' }}>Secret</option>
+                <option value="TopSecret" {{ old('confidentiality', $correspondence?->confidentiality) === 'TopSecret' ? 'selected' : '' }}>Top Secret</option>
+            </select>
+        </div>
 
         @if(!$isReceipt)
             <div>
@@ -108,35 +121,8 @@
                 <x-input id="due_date" type="date" name="due_date" class="mt-1 block w-full"
                     :value="old('due_date', $correspondence?->due_date?->format('Y-m-d'))" />
             </div>
-
-            <div>
-                <x-label for="confidentiality" value="Confidentiality" />
-                <select id="confidentiality" name="confidentiality" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                    <option value="Normal" {{ old('confidentiality', $correspondence?->confidentiality ?? 'Normal') === 'Normal' ? 'selected' : '' }}>Normal</option>
-                    <option value="Confidential" {{ old('confidentiality', $correspondence?->confidentiality) === 'Confidential' ? 'selected' : '' }}>Confidential</option>
-                    <option value="Secret" {{ old('confidentiality', $correspondence?->confidentiality) === 'Secret' ? 'selected' : '' }}>Secret</option>
-                    <option value="TopSecret" {{ old('confidentiality', $correspondence?->confidentiality) === 'TopSecret' ? 'selected' : '' }}>Top Secret</option>
-                </select>
-            </div>
         @endif
     </div>
-
-    @if(!$isReceipt)
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-            <div>
-                <x-label for="status_id" value="Status" />
-                <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                    <option value="">Auto (Initial)</option>
-                    @foreach($statuses as $status)
-                        <option value="{{ $status->id }}"
-                            {{ old('status_id', $correspondence?->status_id) == $status->id ? 'selected' : '' }}>
-                            {{ $status->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-    @endif
 </div>
 
 {{-- From/To Information (Most Important Section) --}}
@@ -240,19 +226,6 @@
                 @foreach($users as $user)
                     <option value="{{ $user->id }}"
                         {{ old('marked_to_user_id', $correspondence?->marked_to_user_id) == $user->id ? 'selected' : '' }}>
-                        {{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div>
-            <x-label for="addressed_to_user_id" value="Addressed To" />
-            <select id="addressed_to_user_id" name="addressed_to_user_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">None</option>
-                @foreach($users as $user)
-                    <option value="{{ $user->id }}"
-                        {{ old('addressed_to_user_id', $correspondence?->addressed_to_user_id) == $user->id ? 'selected' : '' }}>
                         {{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}
                     </option>
                 @endforeach

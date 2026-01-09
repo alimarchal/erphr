@@ -256,7 +256,11 @@
             {{-- Subject --}}
             <td class="py-2 px-2 max-w-xs">
                 <div title="{{ $item->subject }}">{{ Str::limit($item->subject, 50) }}</div>
-                <div title="{{ $item->addressedTo->name }}">{{ Str::limit($item->addressedTo->name, 50) }}</div>
+                @if($item->addressedTo)
+                    <div class="text-[10px] text-gray-400 italic" title="{{ $item->addressedTo->name }}">
+                        Adsd To: {{ Str::limit($item->addressedTo->name, 40) }}
+                    </div>
+                @endif
                
                 <div class="flex flex-wrap gap-1 mt-1">
                     {{-- @if($item->category)
