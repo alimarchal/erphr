@@ -210,7 +210,7 @@
         ['label' => 'S.No', 'align' => 'text-center'],
         ['label' => 'Date'],
         ['label' => 'Register No.'],
-        ['label' => 'Subject'],
+        ['label' => 'Subject / Address To'],
         ['label' => 'From/To'],
         ['label' => 'Confidentiality', 'align' => 'text-center'],
         ['label' => 'Priority', 'align' => 'text-center'],
@@ -232,6 +232,9 @@
                 @if($item->letter_date)
                     <div class="text-xs text-gray-500">Letter: {{ $item->letter_date->format('d-m-Y') }}</div>
                 @endif
+                @if($item->letterType)
+                    <div class="text-xs font-semibold text-gray-600">{{ $item->letterType->name }}</div>
+                @endif
             </td>
 
             {{-- Register No. --}}
@@ -239,29 +242,34 @@
                 <a href="{{ route('correspondence.show', $item) }}" class="text-blue-600 hover:underline font-medium">
                     {{ $item->register_number }}
                 </a>
-                @if($item->letterType)
-                    <div class="text-xs font-semibold text-gray-600">{{ $item->letterType->name }}</div>
-                @endif
                 @if($item->reference_number)
                     <div class="text-xs text-gray-500">Ref: {{ $item->reference_number }}</div>
+                @endif
+                 @if($item->category)
+                 
+                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-black rounded border border-gray-200">
+                            {{ $item->category->name }}
+                        </span>
                 @endif
             </td>
 
             {{-- Subject --}}
             <td class="py-2 px-2 max-w-xs">
                 <div title="{{ $item->subject }}">{{ Str::limit($item->subject, 50) }}</div>
+                <div title="{{ $item->addressedTo->name }}">{{ Str::limit($item->addressedTo->name, 50) }}</div>
+               
                 <div class="flex flex-wrap gap-1 mt-1">
-                    @if($item->category)
+                    {{-- @if($item->category)
                         <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded border border-gray-200">
                             {{ $item->category->name }}
                         </span>
-                    @endif
+                    @endif --}}
                     @if($item->initial_action)
                         <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100">
                             Marking: {{ $item->initial_action }}
                         </span>
                     @endif
-                </div>
+                </div> 
             </td>
 
             {{-- From/To --}}
