@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +17,7 @@ class CorrespondenceMovement extends Model implements HasMedia
     /** @use HasFactory<\Database\Factories\CorrespondenceMovementFactory> */
     use HasFactory;
 
+    use HasUuids;
     use InteractsWithMedia;
     use LogsActivity;
 

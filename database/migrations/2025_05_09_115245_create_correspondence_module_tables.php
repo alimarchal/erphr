@@ -182,7 +182,7 @@ return new class extends Migration
 
         // 8. Correspondence Movements - Marking trail (critical for tracking)
         Schema::create('correspondence_movements', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignUuid('correspondence_id')->constrained('correspondences')->cascadeOnDelete();
             $table->unsignedSmallInteger('sequence')->default(1);
 
@@ -240,7 +240,7 @@ return new class extends Migration
         // 9. Movement Comments - Discussion thread on movements
         Schema::create('movement_comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('movement_id')->constrained('correspondence_movements')->cascadeOnDelete();
+            $table->foreignUuid('movement_id')->constrained('correspondence_movements')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->text('comment');
             $table->boolean('is_private')->default(false)->comment('Only visible to seniors');
