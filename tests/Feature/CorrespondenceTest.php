@@ -284,3 +284,74 @@ test('dispatch correspondence generates register number with DR prefix', functio
     expect($correspondence->register_number)->not->toBeNull();
     expect($correspondence->register_number)->toContain('DR');
 });
+
+test('users who receive correspondence can mark it', function () {
+    // Create users
+    $creator = User::factory()->create();
+    $rajaSaddam = User::factory()->create(['name' => 'Raja Saddam']);
+
+    // Give permissions
+    \Spatie\Permission\Models\Permission::findOrCreate('view correspondence');
+    \Spatie\Permission\Models\Permission::findOrCreate('mark correspondence');
+    $creator->givePermissionTo(['view correspondence', 'mark correspondence']);
+    $rajaSaddam->givePermissionTo(['view correspondence', 'mark correspondence']);
+
+    // Create correspondence and forward to Raja Saddam
+    $correspondence = Correspondence::factory()->create(['created_by' => $creator->id]);
+    $correspondence->markTo($rajaSaddam, 'ForAction', 'Please review this');
+
+    // Raja Saddam should be able to mark it to someone else
+    $this->actingAs($rajaSaddam);
+    $anotherUser = User::factory()->create();
+
+    $this->post(route('correspondence.mark', $correspondence), [
+        'to_user_id' => $anotherUser->id,
+        'action' => 'Forward',
+        'instructions' => 'For your action',
+    ])->assertRedirect()
+        ->assertSessionHas('success');
+});
+
+test('status update creates movement with valid action', function () {
+    $this->actingAs($this->user);
+
+    $correspondence = Correspondence::factory()->create(['created_by' => $this->user->id]);
+    $newStatus = CorrespondenceStatus::factory()->create();
+
+    $this->put(route('correspondence.updateStatus', $correspondence), [
+        'status_id' => $newStatus->id,
+        'remarks' => 'Test status change',
+    ])->assertRedirect()
+        ->assertSessionHas('success', 'Correspondence status updated successfully.');
+
+    // Verify movement was created with valid action
+    $this->assertDatabaseHas('correspondence_movements', [
+        'correspondence_id' => $correspondence->id,
+        'action' => 'ForRecord', // Should be valid enum value, not 'Status Update'
+        'status' => 'Actioned',
+    ]);
+});
+
+test('status update shows detailed error in debug mode', function () {
+    // Temporarily enable debug mode
+    config(['app.debug' => true]);
+
+    $this->actingAs($this->user);
+
+    // Create a correspondence with invalid setup to trigger error
+    $correspondence = Correspondence::factory()->create(['created_by' => $this->user->id]);
+
+    // Mock to force an error
+    \DB::shouldReceive('beginTransaction')->andThrow(new \Exception('Test error message'));
+
+    $newStatus = CorrespondenceStatus::factory()->create();
+
+    $response = $this->put(route('correspondence.updateStatus', $correspondence), [
+        'status_id' => $newStatus->id,
+    ]);
+
+    // Should show detailed error when debug is enabled
+    $response->assertSessionHas('error', function ($message) {
+        return str_contains($message, 'Test error message');
+    });
+});
