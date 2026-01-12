@@ -403,7 +403,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
      */
     public function mark(Request $request, Correspondence $correspondence)
     {
-        $this->authorize('update', $correspondence);
+        $this->authorize('mark', $correspondence);
 
         $request->validate([
             'to_user_id' => ['required', 'exists:users,id'],
@@ -536,7 +536,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             $correspondence->movements()->create([
                 'from_user_id' => auth()->id(),
                 'to_user_id' => auth()->id(),
-                'action' => 'Status Update',
+                'action' => 'ForRecord',
                 'instructions' => "Changed status from '{$oldStatus}' to '{$newStatus}'".($request->remarks ? ". Note: {$request->remarks}" : ''),
                 'status' => 'Actioned', // Mark as completed log
                 'sequence' => ($correspondence->movements()->max('sequence') ?? 0) + 1,
@@ -556,7 +556,12 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Failed to update status.');
+            $errorMessage = 'Failed to update status';
+            if (config('app.debug')) {
+                $errorMessage .= ': '.$e->getMessage();
+            }
+
+            return back()->with('error', $errorMessage);
         }
     }
 
