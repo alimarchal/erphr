@@ -12,7 +12,7 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6">
                     <x-validation-errors class="mb-4 mt-4" />
-                    <form method="POST" action="{{ route('correspondence.update', $correspondence) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('correspondence.update', $correspondence) }}" enctype="multipart/form-data" id="correspondenceEditForm">
                         @csrf
                         @method('PUT')
 
@@ -32,11 +32,25 @@
                                class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 mr-3">
                                 Cancel
                             </a>
-                            <x-button class="ml-4">
-                                Update {{ $type === 'Receipt' ? 'Receipt' : 'Dispatch' }}
+                            <x-button type="submit" class="ml-4" id="updateBtn">
+                                <span id="updateText">Update {{ $type === 'Receipt' ? 'Receipt' : 'Dispatch' }}</span>
+                                <span id="updatingText" class="hidden">Updating...</span>
                             </x-button>
                         </div>
                     </form>
+
+                    <script>
+                        document.getElementById('correspondenceEditForm').addEventListener('submit', function(e) {
+                            const updateBtn = document.getElementById('updateBtn');
+                            const updateText = document.getElementById('updateText');
+                            const updatingText = document.getElementById('updatingText');
+                            
+                            updateBtn.disabled = true;
+                            updateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            updateText.classList.add('hidden');
+                            updatingText.classList.remove('hidden');
+                        });
+                    </script>
                 </div>
             </div>
         </div>
