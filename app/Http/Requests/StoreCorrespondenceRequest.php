@@ -45,7 +45,7 @@ class StoreCorrespondenceRequest extends FormRequest
             'status_id' => ['nullable', 'exists:correspondence_statuses,id'],
             'priority_id' => ['nullable', 'exists:correspondence_priorities,id'],
             'confidentiality' => ['nullable', Rule::in(['Normal', 'Confidential', 'Secret', 'TopSecret'])],
-            'due_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'due_date' => ['nullable', 'date'],
             'delivery_mode' => ['nullable', Rule::in(['Hand', 'Courier', 'Post', 'Email', 'Fax', 'Other'])],
             'courier_name' => ['nullable', 'string', 'max:255'],
             'courier_tracking' => ['nullable', 'string', 'max:255'],
