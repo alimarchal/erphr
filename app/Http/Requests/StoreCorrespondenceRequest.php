@@ -68,7 +68,7 @@ class StoreCorrespondenceRequest extends FormRequest
             'subject.max' => 'The subject cannot exceed 1000 characters.',
             'received_date.required_if' => 'The received date is required for receipts.',
             'dispatch_date.required_if' => 'The dispatch date is required for dispatches.',
-            'due_date.after_or_equal' => 'The due date must be today or a future date.',
+#            'due_date.after_or_equal' => 'The due date must be today or a future date.',
             'attachments.*.max' => 'Each attachment must not exceed 15MB.',
         ];
     }
