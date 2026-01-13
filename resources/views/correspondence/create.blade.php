@@ -12,7 +12,7 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6">
                     <x-validation-errors class="mb-4 mt-4" />
-                    <form method="POST" action="{{ route('correspondence.store') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('correspondence.store') }}" enctype="multipart/form-data" id="correspondenceCreateForm">
                         @csrf
 
                         @include('correspondence.partials.form-fields', [
@@ -30,11 +30,25 @@
                                class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 mr-3">
                                 Cancel
                             </a>
-                            <x-button class="ml-4">
-                                Create {{ $type === 'Receipt' ? 'Receipt' : 'Dispatch' }}
+                            <x-button type="submit" class="ml-4" id="submitBtn">
+                                <span id="submitText">Create {{ $type === 'Receipt' ? 'Receipt' : 'Dispatch' }}</span>
+                                <span id="loadingText" class="hidden">Creating...</span>
                             </x-button>
                         </div>
                     </form>
+
+                    <script>
+                        document.getElementById('correspondenceCreateForm').addEventListener('submit', function(e) {
+                            const submitBtn = document.getElementById('submitBtn');
+                            const submitText = document.getElementById('submitText');
+                            const loadingText = document.getElementById('loadingText');
+                            
+                            submitBtn.disabled = true;
+                            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            submitText.classList.add('hidden');
+                            loadingText.classList.remove('hidden');
+                        });
+                    </script>
                 </div>
             </div>
         </div>

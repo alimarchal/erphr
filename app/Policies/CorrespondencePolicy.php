@@ -68,6 +68,26 @@ class CorrespondencePolicy
     }
 
     /**
+     * Determine whether the user can mark the correspondence.
+     */
+    public function mark(User $user, Correspondence $correspondence): bool
+    {
+        if (! $user->can('mark correspondence')) {
+            return false;
+        }
+
+        // User can mark if they are:
+        // 1. The creator
+        // 2. The current holder
+        // 3. Marked to them (marked_to_user_id)
+        // 4. Part of movement chain (to_user_id in any movement)
+        return $correspondence->created_by === $user->id ||
+               $correspondence->current_holder_id === $user->id ||
+               $correspondence->marked_to_user_id === $user->id ||
+               $correspondence->movements()->where('to_user_id', $user->id)->exists();
+    }
+
+    /**
      * Determine whether the user can update movements.
      */
     public function updateMovement(User $user, Correspondence $correspondence): bool
