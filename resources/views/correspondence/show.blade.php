@@ -83,6 +83,14 @@
                         <div>
                             <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-4 border-b border-blue-100 pb-1">Basic Details</h4>
                             <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                                @if($correspondence->isReceipt())
+                                    <dt class="text-gray-500">Receipt No:</dt>
+                                    <dd class="font-bold text-gray-900">{{ $correspondence->receipt_no ?? '-' }}</dd>
+                                @else
+                                    <dt class="text-gray-500">Dispatch No:</dt>
+                                    <dd class="font-bold text-gray-900">{{ $correspondence->dispatch_no ?? '-' }}</dd>
+                                @endif
+
                                 <dt class="text-gray-500">Register No:</dt>
                                 <dd class="font-bold text-gray-900">{{ $correspondence->register_number }}</dd>
 

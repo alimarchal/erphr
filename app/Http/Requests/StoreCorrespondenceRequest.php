@@ -26,6 +26,8 @@ class StoreCorrespondenceRequest extends FormRequest
 
         return [
             'type' => ['required', Rule::in(['Receipt', 'Dispatch'])],
+            'receipt_no' => ['nullable', 'string', 'max:255', 'required_if:type,Receipt'],
+            'dispatch_no' => ['nullable', 'string', 'max:255', 'required_if:type,Dispatch'],
             'letter_type_id' => ['nullable', 'exists:letter_types,id'],
             'category_id' => ['nullable', 'exists:correspondence_categories,id'],
             'reference_number' => ['nullable', 'string', 'max:255'],

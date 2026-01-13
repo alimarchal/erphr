@@ -23,6 +23,8 @@ class UpdateCorrespondenceRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'receipt_no' => ['nullable', 'string', 'max:255', 'required_if:type,Receipt'],
+            'dispatch_no' => ['nullable', 'string', 'max:255', 'required_if:type,Dispatch'],
             'letter_type_id' => ['nullable', 'exists:letter_types,id'],
             'category_id' => ['nullable', 'exists:correspondence_categories,id'],
             'reference_number' => ['nullable', 'string', 'max:255'],

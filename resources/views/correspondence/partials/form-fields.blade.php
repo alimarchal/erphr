@@ -11,6 +11,22 @@
     <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $isReceipt ? 'Receipt' : 'Dispatch' }} Information</h3>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        @if($isReceipt)
+            <div>
+                <x-label for="receipt_no" value="Receipt No." :required="true" />
+                <x-input id="receipt_no" type="text" name="receipt_no" class="mt-1 block w-full"
+                    :value="old('receipt_no', $correspondence?->receipt_no)" required
+                    placeholder="Enter Receipt Number" />
+            </div>
+        @else
+            <div>
+                <x-label for="dispatch_no" value="Dispatch No." :required="true" />
+                <x-input id="dispatch_no" type="text" name="dispatch_no" class="mt-1 block w-full"
+                    :value="old('dispatch_no', $correspondence?->dispatch_no)" required
+                    placeholder="Enter Dispatch Number" />
+            </div>
+        @endif
+
         <div>
             <x-label for="letter_type_id" value="Letter Type" />
             <select id="letter_type_id" name="letter_type_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
@@ -49,7 +65,9 @@
                 @endforeach
             </select>
         </div>
+    </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <div>
             <x-label :for="$isReceipt ? 'received_date' : 'dispatch_date'"
                 :value="$isReceipt ? 'Received Date' : 'Dispatch Date'" :required="true" />
@@ -61,9 +79,7 @@
                     :value="old('dispatch_date', $correspondence?->dispatch_date?->format('Y-m-d') ?? now()->format('Y-m-d'))" required />
             @endif
         </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <div>
             <x-label for="reference_number" value="Reference Number" />
             <x-input id="reference_number" type="text" name="reference_number" class="mt-1 block w-full"
@@ -89,7 +105,9 @@
                 @endforeach
             </select>
         </div>
+    </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <div>
             <x-label for="status_id" value="Status" />
             <select id="status_id" name="status_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
@@ -102,9 +120,7 @@
                 @endforeach
             </select>
         </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <div>
             <x-label for="confidentiality" value="Confidentiality" />
             <select id="confidentiality" name="confidentiality" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">

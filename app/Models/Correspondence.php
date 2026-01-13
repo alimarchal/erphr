@@ -36,6 +36,8 @@ class Correspondence extends Model implements HasMedia
 
     protected $fillable = [
         'type',
+        'dispatch_no',
+        'receipt_no',
         'register_number',
         'year',
         'serial_number',

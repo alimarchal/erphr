@@ -57,6 +57,8 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
         $query = QueryBuilder::for(Correspondence::query())
             ->allowedFilters([
+                AllowedFilter::partial('receipt_no'),
+                AllowedFilter::partial('dispatch_no'),
                 AllowedFilter::partial('register_number'),
                 AllowedFilter::partial('reference_number'),
                 AllowedFilter::partial('subject'),

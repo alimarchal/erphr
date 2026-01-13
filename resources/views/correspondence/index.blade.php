@@ -83,6 +83,22 @@
             <input type="hidden" name="type" value="{{ $type }}">
         @endif
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            @if(!$type || $type === 'Receipt')
+                <div>
+                    <x-label for="filter_receipt_no" value="Receipt No." />
+                    <x-input id="filter_receipt_no" name="filter[receipt_no]" type="text" class="mt-1 block w-full"
+                        :value="request('filter.receipt_no')" placeholder="Search..." />
+                </div>
+            @endif
+
+            @if(!$type || $type === 'Dispatch')
+                <div>
+                    <x-label for="filter_dispatch_no" value="Dispatch No." />
+                    <x-input id="filter_dispatch_no" name="filter[dispatch_no]" type="text" class="mt-1 block w-full"
+                        :value="request('filter.dispatch_no')" placeholder="Search..." />
+                </div>
+            @endif
+
             <div>
                 <x-label for="filter_register_number" value="Register No." />
                 <x-input id="filter_register_number" name="filter[register_number]" type="text" class="mt-1 block w-full"
@@ -207,7 +223,7 @@
     </x-filter-section>
 
     <x-data-table :items="$correspondences" :headers="[
-        ['label' => 'S.No', 'align' => 'text-center'],
+        ['label' => 'Record No.', 'align' => 'text-center'],
         ['label' => 'Date'],
         ['label' => 'Register No.'],
         ['label' => 'Subject / Address To'],
@@ -221,9 +237,9 @@
         emptyLinkText="Create one">
         @foreach ($correspondences as $index => $item)
         <tr class="border-b border-gray-200 text-sm hover:bg-gray-50 {{ $item->isOverdue() ? 'bg-red-50' : '' }}">
-            {{-- S.No --}}
-            <td class="py-2 px-2 text-center">
-                {{ $correspondences->firstItem() + $index }}
+            {{-- Record No. --}}
+            <td class="py-2 px-2 text-center font-bold">
+                {{ $item->type === 'Receipt' ? $item->receipt_no : $item->dispatch_no }}
             </td>
 
             {{-- Date --}}
