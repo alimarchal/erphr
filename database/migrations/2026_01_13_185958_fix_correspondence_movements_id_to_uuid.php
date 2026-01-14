@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,8 +12,23 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if id column is already uuid - if so, skip the conversion
+        $columns = DB::select("SELECT data_type FROM information_schema.columns WHERE table_name = 'correspondence_movements' AND column_name = 'id'");
+        
+        if (!empty($columns) && $columns[0]->data_type === 'uuid') {
+            // ID is already UUID, just ensure movement_comments.movement_id is also set up correctly
+            Schema::table('movement_comments', function (Blueprint $table) {
+                if (!Schema::hasColumn('movement_comments', 'movement_id')) {
+                    $table->uuid('movement_id')->after('id');
+                    $table->foreign('movement_id')->references('id')->on('correspondence_movements')->cascadeOnDelete();
+                }
+            });
+            return;
+        }
+
         // For PostgreSQL, changing type from bigint to uuid is tricky even when empty.
-        // Since tables are empty, we can drop and recreate the columns.
+        // First, handle any null values in id column
+        DB::statement('DELETE FROM correspondence_movements WHERE id IS NULL');
         
         Schema::table('movement_comments', function (Blueprint $table) {
             if (Schema::hasColumn('movement_comments', 'movement_id')) {
