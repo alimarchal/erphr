@@ -6,6 +6,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -14,7 +15,7 @@ Route::get('/', function () {
     return to_route('login');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -87,14 +88,4 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{correspondence}/status', [CorrespondenceController::class, 'updateStatus'])->name('status.update');
         Route::post('/{correspondence}/comment', [CorrespondenceController::class, 'addComment'])->name('comment.add');
     });
-});
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
 });
