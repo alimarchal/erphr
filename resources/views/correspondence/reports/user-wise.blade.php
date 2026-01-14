@@ -53,49 +53,77 @@
                 }
 
                 @media print {
+                    @page {
+                        size: A4 portrait;
+                        margin: 1cm;
+                    }
+
                     .no-print {
                         display: none !important;
                     }
 
-                    .max-w-7xl {
+                    .max-w-7xl,
+                    .max-w-2xl {
                         max-width: 100% !important;
                         width: 100% !important;
                         margin: 0 !important;
+                        padding: 0 !important;
                     }
 
                     body {
                         background-color: white !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+
+                    .p-6,
+                    .py-6,
+                    .px-6,
+                    .sm\:px-6,
+                    .lg\:px-8 {
+                        padding: 0 !important;
+                        margin: 0 !important;
                     }
 
                     .report-table {
                         font-size: 8px !important;
+                        width: 100% !important;
                     }
 
                     .report-table span {
                         font-size: 7px !important;
                     }
 
-                    .shadow-xl, .shadow, .bg-white {
+                    .shadow-xl,
+                    .shadow,
+                    .bg-white,
+                    .sm\:rounded-lg {
                         box-shadow: none !important;
                         background: transparent !important;
+                        border: none !important;
                     }
                 }
 
-                    .report-table th, .report-table td {
-                        padding: 4px !important;
-                    }
+                .report-table th,
+                .report-table td {
+                    padding: 4px !important;
                 }
             </style>
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                <div class="text-center mb-6">
-                    <h2 class="text-xl font-bold text-gray-800">{{ config('app.name') }}</h2>
-                    <h1 class="text-2xl font-bold uppercase underline mt-2">User-wise Status & Workload Report</h1>
-                    <p class="text-sm text-gray-600 mt-2 italic max-w-2xl mx-auto">
-                        This report provides a comprehensive summary of correspondences addressed to, marked to, and currently held by each user. 
-                        It includes a detailed breakdown of statuses for all correspondences currently in a user's possession.
+                <div class="text-center mb-8 border-b-2 border-transparent print:border-black pb-4">
+                    <h2 class="text-xl font-bold text-gray-800 print:text-black">{{ config('app.name') }}</h2>
+                    <h1
+                        class="text-2xl font-bold uppercase underline mt-2 print:text-black print:no-underline print:text-xl">
+                        User-wise Status & Workload Report</h1>
+                    <p class="text-sm text-gray-600 mt-2 italic max-w-2xl mx-auto print:text-black print:mt-1">
+                        This report provides a comprehensive summary of correspondences addressed to, marked to, and
+                        currently held by each user.
+                        It includes a detailed breakdown of statuses for all correspondences currently in a user's
+                        possession.
                     </p>
-                    <p class="text-xs text-gray-500 mt-4">Report Generated on: {{ now()->format('d-M-Y h:i A') }}</p>
+                    <p class="text-xs text-gray-500 mt-4 print:text-black print:text-sm print:mt-2">Report Generated on:
+                        {{ now()->format('d-M-Y h:i A') }}</p>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -161,42 +189,42 @@
         function downloadPDF(title = 'Data Report') {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
-            
+
             // Header
             pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
             pdf.text(title.toUpperCase(), 105, 20, { align: 'center' });
-            
+
             pdf.setFontSize(9);
             pdf.setFont(undefined, 'italic');
             pdf.text('This report provides a summary of correspondences addressed to, marked to, and currently held by each user.', 105, 28, { align: 'center' });
-            
+
             pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
             pdf.text('Generated: ' + new Date().toLocaleDateString(), 105, 35, { align: 'center' });
-            
+
             // Get table
             const table = document.querySelector('.report-table');
             const rows = table.querySelectorAll('tr');
-            
+
             let yPos = 45;
             const pageHeight = 280;
             const margin = 10;
             const pageWidth = 190;
-            
+
             // This is a simple table crawler for complex headers
             // For simpler logic, we just grab all rows and cells
             pdf.setFontSize(7);
-            
+
             for (let i = 0; i < rows.length; i++) {
                 const cells = rows[i].querySelectorAll('th, td');
                 const colWidth = (pageWidth - (margin * 2)) / cells.length;
-                
+
                 if (yPos > pageHeight - 20) {
                     pdf.addPage();
                     yPos = 20;
                 }
-                
+
                 let xPos = margin;
                 cells.forEach((cell) => {
                     const text = cell.innerText.trim().split('\n')[0]; // Just take first line
@@ -206,7 +234,7 @@
                 });
                 yPos += 7;
             }
-            
+
             const filename = title.toLowerCase().replace(/\s+/g, '-') + '.pdf';
             pdf.save(filename);
         }

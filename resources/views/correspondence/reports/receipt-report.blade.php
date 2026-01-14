@@ -40,6 +40,11 @@
     <div class="py-6 space-y-6">
         <style>
             @media print {
+                @page {
+                    size: A4 portrait;
+                    margin: 1cm;
+                }
+
                 .no-print {
                     display: none !important;
                 }
@@ -51,18 +56,38 @@
                 body {
                     background-color: white !important;
                     color: black !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
                 }
 
-                .max-w-7xl {
+                .max-w-7xl,
+                .max-w-2xl {
                     max-width: 100% !important;
                     width: 100% !important;
                     margin: 0 !important;
                     padding: 0 !important;
                 }
 
-                .bg-white {
+                .bg-white,
+                .sm\:rounded-lg,
+                .shadow-xl,
+                .shadow {
                     box-shadow: none !important;
                     border: none !important;
+                    background: transparent !important;
+                }
+
+                .py-6,
+                .py-12,
+                .p-6,
+                .p-8,
+                .px-4,
+                .px-6,
+                .px-8,
+                .sm\:px-6,
+                .lg\:px-8 {
+                    padding: 0 !important;
+                    margin: 0 !important;
                 }
             }
         </style>
@@ -171,7 +196,7 @@
                             'addressed_to' => $item->addressedTo?->name ?? 'N/A',
                             'holder' => $item->currentHolder?->name ?? 'N/A',
                             'status' => $item->status?->name ?? 'N/A',
-                            'aging' => $item->current_holder_since ? now()->diffInDays($item->current_holder_since) . ' days' : '0 days',
+                            'aging' => $item->current_holder_since ? (int)now()->diffInDays($item->current_holder_since) . ' days' : '0 days',
                         ];
                     })->toArray();
                 @endphp

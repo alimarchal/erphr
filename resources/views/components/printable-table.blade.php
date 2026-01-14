@@ -10,25 +10,18 @@
 ])
 
 <div class="printable-table-container">
-    <!-- Print Header -->
-    <div class="print-header hidden print:block text-center mb-6 pb-4 border-b-2 border-black">
-        <h1 class="text-xl font-bold text-black uppercase">{{ $title }}</h1>
+    <!-- Header (Unified for Screen & Print) -->
+    <div class="text-center mb-8 border-b-2 border-transparent print:border-black pb-4">
+        <h2 class="text-xl font-bold text-gray-800 print:text-black">{{ $organization }}</h2>
+        <h1 class="text-2xl font-bold uppercase underline mt-2 print:text-black print:no-underline print:text-xl">{{ $title }}</h1>
         @if($description)
-            <p class="text-sm text-black mt-1 italic">{{ $description }}</p>
+            <p class="text-sm text-gray-600 mt-2 italic max-w-3xl mx-auto print:text-black print:mt-1">{{ $description }}</p>
         @endif
-        <p class="text-sm text-black mt-2">Generated on: <span class="print-date"></span></p>
-        <p class="text-sm text-black">{{ $organization }}</p>
+        <p class="text-xs text-gray-500 mt-4 print:text-black print:text-sm print:mt-2">
+            Report Generated on: {{ now()->format('d-M-Y h:i A') }}
+        </p>
     </div>
 
-    <!-- Web Header (Visible on screen but not in print handled by parent or here) -->
-    <div class="text-center mb-6 print:hidden">
-        <h2 class="text-xl font-bold text-gray-800">{{ $organization }}</h2>
-        <h1 class="text-2xl font-bold uppercase underline mt-2">{{ $title }}</h1>
-        @if($description)
-            <p class="text-sm text-gray-600 mt-2 italic max-w-3xl mx-auto">{{ $description }}</p>
-        @endif
-        <p class="text-xs text-gray-500 mt-4">Report Generated on: {{ now()->format('d-M-Y h:i A') }}</p>
-    </div>
     @if($showActions)
     <div class="mb-4 print:hidden">
         <button onclick="downloadPDF('{{ $title }}')" 
@@ -102,7 +95,7 @@
 @media print {
     @page {
         size: A4 portrait;
-        margin: auto;
+        margin: 1cm;
     }
     
     body * {
@@ -119,16 +112,29 @@
         top: 0;
         width: 100%;
         box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
-    .shadow, .shadow-xl, .shadow-md, .bg-white {
+    .shadow, .shadow-xl, .shadow-md, .bg-white, .rounded-lg {
         box-shadow: none !important;
         background: transparent !important;
+        border: none !important;
     }
     
     .print\:hidden {
         display: none !important;
     }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .py-6, .py-12, .p-6, .px-4, .px-6, .sm\:px-6, .lg\:px-8 {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}
     
     .print\:block {
         display: block !important;
@@ -168,13 +174,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const printDates = document.querySelectorAll('.print-date');
-    printDates.forEach(el => {
-        el.textContent = new Date().toLocaleDateString();
-    });
-});
-
 function downloadPDF(title = 'Data Report') {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');

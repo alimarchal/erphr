@@ -83,7 +83,9 @@
     <style>
         @media print {
             @page {
-                margin: auto;
+                size: A4 portrait;
+                margin: 1cm;
+                /* standard professional margin */
             }
 
             nav,
@@ -93,28 +95,47 @@
                 display: none !important;
             }
 
-            .max-w-7xl {
+            .max-w-7xl,
+            .max-w-2xl {
                 max-width: 100% !important;
                 width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
 
+            .bg-white,
+            .bg-gray-100,
+            .shadow,
+            .shadow-xl,
+            .sm\:rounded-lg,
+            .rounded-lg {
+                background: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .py-6,
+            .py-12,
+            .p-6,
+            .p-8,
+            .px-4,
+            .px-6,
+            .px-8 {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
             body {
                 background-color: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             * {
                 box-shadow: none !important;
                 text-shadow: none !important;
-            }
-
-            .bg-white,
-            .bg-gray-100,
-            .shadow,
-            .shadow-xl {
-                background: transparent !important;
-                box-shadow: none !important;
             }
         }
     </style>

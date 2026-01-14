@@ -53,40 +53,67 @@
                 }
 
                 @media print {
+                    @page {
+                        size: A4 portrait;
+                        margin: 1cm;
+                    }
+
                     .no-print {
                         display: none !important;
                     }
 
-                    .max-w-7xl {
+                    .max-w-7xl,
+                    .max-w-2xl {
                         max-width: 100% !important;
                         width: 100% !important;
                         margin: 0 !important;
+                        padding: 0 !important;
                     }
 
                     body {
                         background-color: white !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+
+                    .p-6,
+                    .py-6,
+                    .px-6,
+                    .sm\:px-6,
+                    .lg\:px-8 {
+                        padding: 0 !important;
+                        margin: 0 !important;
                     }
 
                     .report-table {
                         font-size: 10px !important;
+                        width: 100% !important;
                     }
 
-                    .shadow-xl, .shadow, .bg-white {
+                    .shadow-xl,
+                    .shadow,
+                    .bg-white,
+                    .sm\:rounded-lg {
                         box-shadow: none !important;
                         background: transparent !important;
+                        border: none !important;
                     }
                 }
             </style>
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                <div class="text-center mb-6">
-                    <h2 class="text-xl font-bold text-gray-800">{{ config('app.name') }}</h2>
-                    <h1 class="text-2xl font-bold uppercase underline mt-2">Monthly Correspondence Handled Summary</h1>
-                    <p class="text-sm text-gray-600 mt-2 italic max-w-2xl mx-auto">
-                        This report summarizes the total volume of correspondences handled by each user, grouped by month and year. 
+                <div class="text-center mb-8 border-b-2 border-transparent print:border-black pb-4">
+                    <h2 class="text-xl font-bold text-gray-800 print:text-black">{{ config('app.name') }}</h2>
+                    <h1
+                        class="text-2xl font-bold uppercase underline mt-2 print:text-black print:no-underline print:text-xl">
+                        Monthly Correspondence Handled Summary</h1>
+                    <p class="text-sm text-gray-600 mt-2 italic max-w-2xl mx-auto print:text-black print:mt-1">
+                        This report summarizes the total volume of correspondences handled by each user, grouped by
+                        month and year.
                         It reflects the distribution of workload across the organization over time.
                     </p>
-                    <p class="text-xs text-gray-500 mt-4">Report Generated on: {{ now()->format('d-M-Y h:i A') }}</p>
+                    <p class="text-xs text-gray-500 mt-4 print:text-black print:text-sm print:mt-2">Report Generated on:
+                        {{ now()->format('d-M-Y h:i A') }}</p>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -133,40 +160,40 @@
         function downloadPDF(title = 'Data Report') {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
-            
+
             // Header
             pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
             pdf.text(title.toUpperCase(), 105, 20, { align: 'center' });
-            
+
             pdf.setFontSize(9);
             pdf.setFont(undefined, 'italic');
             pdf.text('This report summarizes the total volume of correspondences handled by each user, grouped by month and year.', 105, 28, { align: 'center' });
-            
+
             pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
             pdf.text('Generated: ' + new Date().toLocaleDateString(), 105, 35, { align: 'center' });
-            
+
             // Get table
             const table = document.querySelector('.report-table');
             const rows = table.querySelectorAll('tr');
-            
+
             let yPos = 45;
             const pageHeight = 280;
             const margin = 10;
             const pageWidth = 190;
-            
+
             pdf.setFontSize(9);
-            
+
             for (let i = 0; i < rows.length; i++) {
                 const cells = rows[i].querySelectorAll('th, td');
                 const colWidth = (pageWidth - (margin * 2)) / cells.length;
-                
+
                 if (yPos > pageHeight - 20) {
                     pdf.addPage();
                     yPos = 20;
                 }
-                
+
                 let xPos = margin;
                 cells.forEach((cell) => {
                     const text = cell.innerText.trim();
@@ -176,7 +203,7 @@
                 });
                 yPos += 8;
             }
-            
+
             const filename = title.toLowerCase().replace(/\s+/g, '-') + '.pdf';
             pdf.save(filename);
         }
