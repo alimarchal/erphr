@@ -17,8 +17,13 @@
                     </x-nav-link>
 
                     <x-nav-link href="{{ route('correspondence.index') }}"
-                        :active="request()->routeIs('correspondence.*')">
+                        :active="request()->routeIs('correspondence.index')">
                         {{ __('Correspondence') }}
+                    </x-nav-link>
+
+                    <x-nav-link href="{{ route('correspondence.reports.index') }}"
+                        :active="request()->routeIs('correspondence.reports.*')">
+                        {{ __('Reports') }}
                     </x-nav-link>
 
                     @can('view users')
@@ -188,8 +193,13 @@
             </x-responsive-nav-link>
 
             <x-responsive-nav-link href="{{ route('correspondence.index') }}"
-                :active="request()->routeIs('correspondence.*')">
+                :active="request()->routeIs('correspondence.index')">
                 {{ __('Correspondence') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link href="{{ route('correspondence.reports.index') }}"
+                :active="request()->routeIs('correspondence.reports.*')">
+                {{ __('Reports') }}
             </x-responsive-nav-link>
 
             @can('view users')

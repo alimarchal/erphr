@@ -3,6 +3,7 @@
     'data' => [],
     'headers' => [],
     'title' => 'Data Report',
+    'description' => null,
     'showActions' => true,
     'actionButtons' => null,
     'organization' => 'Organization Name'
@@ -12,11 +13,22 @@
     <!-- Print Header -->
     <div class="print-header hidden print:block text-center mb-6 pb-4 border-b-2 border-black">
         <h1 class="text-xl font-bold text-black uppercase">{{ $title }}</h1>
+        @if($description)
+            <p class="text-sm text-black mt-1 italic">{{ $description }}</p>
+        @endif
         <p class="text-sm text-black mt-2">Generated on: <span class="print-date"></span></p>
         <p class="text-sm text-black">{{ $organization }}</p>
     </div>
 
-    <!-- Download Button -->
+    <!-- Web Header (Visible on screen but not in print handled by parent or here) -->
+    <div class="text-center mb-6 print:hidden">
+        <h2 class="text-xl font-bold text-gray-800">{{ $organization }}</h2>
+        <h1 class="text-2xl font-bold uppercase underline mt-2">{{ $title }}</h1>
+        @if($description)
+            <p class="text-sm text-gray-600 mt-2 italic max-w-3xl mx-auto">{{ $description }}</p>
+        @endif
+        <p class="text-xs text-gray-500 mt-4">Report Generated on: {{ now()->format('d-M-Y h:i A') }}</p>
+    </div>
     @if($showActions)
     <div class="mb-4 print:hidden">
         <button onclick="downloadPDF('{{ $title }}')" 
@@ -30,18 +42,18 @@
     @endif
 
     <!-- Table -->
-    <div class="data-table bg-white border border-gray-400 print:border-black overflow-hidden">
+    <div class="data-table overflow-hidden">
         @if (count($data) > 0)
-            <table class="w-full border-collapse table-auto">
+            <table class="w-full border-collapse border-2 border-black">
                 <thead>
                     <tr class="bg-gray-100 print:bg-gray-200">
                         @foreach($headers as $header)
-                            <th class="border border-gray-400 print:border-black px-3 py-2 text-left text-xs font-bold text-black uppercase">
+                            <th class="border border-black px-3 py-2 text-left text-xs font-bold text-black uppercase">
                                 {{ $header }}
                             </th>
                         @endforeach
                         @if($showActions && $actionButtons)
-                            <th class="border border-gray-400 print:border-black px-3 py-2 text-center text-xs font-bold text-black uppercase print:hidden">
+                            <th class="border border-black px-3 py-2 text-center text-xs font-bold text-black uppercase print:hidden">
                                 Actions
                             </th>
                         @endif
@@ -52,7 +64,7 @@
                         <tr class="hover:bg-gray-50 print:hover:bg-transparent">
                             @foreach($row as $key => $value)
                                 @if(!in_array($key, ['actions']))
-                                    <td class="border border-gray-400 print:border-black px-3 py-2 text-xs text-black break-words">
+                                    <td class="border border-black px-3 py-2 text-xs text-black break-words">
                                         @if(is_array($value))
                                             {{ implode(', ', $value) }}
                                         @elseif($value instanceof \Carbon\Carbon)
@@ -67,7 +79,7 @@
                             @endforeach
                             
                             @if($showActions && $actionButtons)
-                                <td class="border border-gray-400 print:border-black px-3 py-2 text-center print:hidden">
+                                <td class="border border-black px-3 py-2 text-center print:hidden">
                                     <div class="flex justify-center space-x-1">
                                         {!! $actionButtons($row, $index) !!}
                                     </div>
@@ -78,7 +90,7 @@
                 </tbody>
             </table>
         @else
-            <div class="text-center py-12 border border-gray-400">
+            <div class="text-center py-12 border border-black">
                 <p class="text-gray-600">No data found.</p>
             </div>
         @endif
@@ -90,7 +102,7 @@
 @media print {
     @page {
         size: A4 portrait;
-        margin: 0.5in;
+        margin: auto;
     }
     
     body * {
@@ -106,6 +118,12 @@
         left: 0;
         top: 0;
         width: 100%;
+        box-shadow: none !important;
+    }
+
+    .shadow, .shadow-xl, .shadow-md, .bg-white {
+        box-shadow: none !important;
+        background: transparent !important;
     }
     
     .print\:hidden {
@@ -135,8 +153,9 @@
     }
     
     th, td {
-        padding: 6px 4px !important;
+        padding: 4px 2px !important;
         word-wrap: break-word;
+        font-size: 8px !important;
     }
     
     thead {
@@ -176,8 +195,8 @@ function downloadPDF(title = 'Data Report') {
     
     let yPos = 45;
     const pageHeight = 280;
-    const margin = 15;
-    const pageWidth = 180;
+    const margin = 10;
+    const pageWidth = 190;
     
     // Calculate column widths based on content
     const numCols = headers.length;

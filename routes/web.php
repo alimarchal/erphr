@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CorrespondenceController;
+use App\Http\Controllers\CorrespondenceReportController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -50,6 +51,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Correspondence Module Routes
     Route::prefix('correspondence')->name('correspondence.')->group(function () {
+        // Reports (MUST be before CRUD to avoid matching {correspondence} parameter)
+        Route::get('/reports', [CorrespondenceReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/receipts', [CorrespondenceReportController::class, 'receiptReport'])->name('reports.receipts');
+        Route::get('/reports/dispatches', [CorrespondenceReportController::class, 'dispatchReport'])->name('reports.dispatches');
+        Route::get('/reports/user-wise', [CorrespondenceReportController::class, 'userWiseReport'])->name('reports.user-wise');
+        Route::get('/reports/monthly-summary', [CorrespondenceReportController::class, 'monthlySummaryReport'])->name('reports.monthly-summary');
+
         // Main correspondence CRUD
         Route::get('/', [CorrespondenceController::class, 'index'])->name('index');
         Route::get('/create', [CorrespondenceController::class, 'create'])->name('create');

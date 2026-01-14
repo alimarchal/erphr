@@ -1,10 +1,11 @@
 @props([
     'action' => '#',
     'method' => 'GET',
+    'isExpanded' => false,
 ])
 
 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
-    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" id="filters" style="display: none">
+    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" id="filters" style="display: {{ $isExpanded ? 'block' : 'none' }}">
         <div class="p-6">
             <form method="{{ $method }}" action="{{ $action }}">
                 @if($method !== 'GET')
