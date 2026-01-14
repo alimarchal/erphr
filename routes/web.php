@@ -52,11 +52,25 @@ Route::middleware(['auth'])->group(function () {
     // Correspondence Module Routes
     Route::prefix('correspondence')->name('correspondence.')->group(function () {
         // Reports (MUST be before CRUD to avoid matching {correspondence} parameter)
-        Route::get('/reports', [CorrespondenceReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/receipts', [CorrespondenceReportController::class, 'receiptReport'])->name('reports.receipts');
-        Route::get('/reports/dispatches', [CorrespondenceReportController::class, 'dispatchReport'])->name('reports.dispatches');
-        Route::get('/reports/user-wise', [CorrespondenceReportController::class, 'userWiseReport'])->name('reports.user-wise');
-        Route::get('/reports/monthly-summary', [CorrespondenceReportController::class, 'monthlySummaryReport'])->name('reports.monthly-summary');
+        Route::middleware(['can:view correspondence reports'])->group(function () {
+            Route::get('/reports', [CorrespondenceReportController::class, 'index'])->name('reports.index');
+
+            Route::get('/reports/receipts', [CorrespondenceReportController::class, 'receiptReport'])
+                ->middleware('can:view receipt report')
+                ->name('reports.receipts');
+
+            Route::get('/reports/dispatches', [CorrespondenceReportController::class, 'dispatchReport'])
+                ->middleware('can:view dispatch report')
+                ->name('reports.dispatches');
+
+            Route::get('/reports/user-wise', [CorrespondenceReportController::class, 'userWiseReport'])
+                ->middleware('can:view user summary report')
+                ->name('reports.user-wise');
+
+            Route::get('/reports/monthly-summary', [CorrespondenceReportController::class, 'monthlySummaryReport'])
+                ->middleware('can:view monthly summary report')
+                ->name('reports.monthly-summary');
+        });
 
         // Main correspondence CRUD
         Route::get('/', [CorrespondenceController::class, 'index'])->name('index');

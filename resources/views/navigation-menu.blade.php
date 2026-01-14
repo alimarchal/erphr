@@ -21,10 +21,12 @@
                         {{ __('Correspondence') }}
                     </x-nav-link>
 
-                    <x-nav-link href="{{ route('correspondence.reports.index') }}"
-                        :active="request()->routeIs('correspondence.reports.*')">
-                        {{ __('Reports') }}
-                    </x-nav-link>
+                    @can('view correspondence reports')
+                        <x-nav-link href="{{ route('correspondence.reports.index') }}"
+                            :active="request()->routeIs('correspondence.reports.*')">
+                            {{ __('Reports') }}
+                        </x-nav-link>
+                    @endcan
 
                     @can('view users')
                         <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
@@ -197,10 +199,12 @@
                 {{ __('Correspondence') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link href="{{ route('correspondence.reports.index') }}"
-                :active="request()->routeIs('correspondence.reports.*')">
-                {{ __('Reports') }}
-            </x-responsive-nav-link>
+            @can('view correspondence reports')
+                <x-responsive-nav-link href="{{ route('correspondence.reports.index') }}"
+                    :active="request()->routeIs('correspondence.reports.*')">
+                    {{ __('Reports') }}
+                </x-responsive-nav-link>
+            @endcan
 
             @can('view users')
                 <x-responsive-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
