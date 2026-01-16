@@ -270,6 +270,34 @@ class CorrespondenceController extends Controller implements HasMiddleware
             ->event('viewed')
             ->log("Viewed correspondence: {$correspondence->register_number}");
 
+        // Auto-mark pending movements as received when user opens the correspondence
+        $correspondence->movements()
+            ->where('to_user_id', auth()->id())
+            ->where('status', 'Pending')
+            ->get()
+            ->each(function ($movement) {
+                $movement->markAsReceived();
+                
+                activity()
+                    ->performedOn($movement->correspondence)
+                    ->event('auto-received')
+                    ->log("Movement #{$movement->sequence} automatically marked as received on view");
+            });
+
+        // Auto-mark received movements as reviewed when user opens the correspondence
+        $correspondence->movements()
+            ->where('to_user_id', auth()->id())
+            ->where('status', 'Received')
+            ->get()
+            ->each(function ($movement) {
+                $movement->markAsReviewed();
+                
+                activity()
+                    ->performedOn($movement->correspondence)
+                    ->event('auto-reviewed')
+                    ->log("Movement #{$movement->sequence} automatically marked as reviewed on view");
+            });
+
         $correspondence->load([
             'letterType',
             'category',

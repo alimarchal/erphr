@@ -559,85 +559,49 @@
                     </div>
                 </div>
 
-                <div class="p-6">
+                <div class="">
                     {{-- Timeline Tab --}}
-                    <div x-show="activeTab === 'timeline'" class="space-y-0 print-section">
+                    <div x-show="activeTab === 'timeline'" class="print-section">
                         <h4 class="hidden print:block font-bold text-sm mb-2 border-b border-black pb-1">MOVEMENT TIMELINE</h4>
                         @if($correspondence->movements->count() > 0)
-                            <div class="relative max-h-[500px] overflow-y-auto">
-                                <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-200 no-print"></div>
-                                <div class="space-y-6 print:space-y-2">
-                                    @foreach($correspondence->movements->sortByDesc('created_at') as $movement)
-                                        <div class="relative pl-12 print:pl-0 print-timeline-item">
-                                            <div class="absolute left-[10px] top-1 w-3 h-3 rounded-full border-2 border-white ring-2 ring-offset-2 no-print
-                                                {{ $movement->status === 'Pending' ? 'bg-yellow-400 ring-yellow-400' : '' }}
-                                                {{ $movement->status === 'Received' ? 'bg-blue-500 ring-blue-500' : '' }}
-                                                {{ $movement->status === 'Reviewed' ? 'bg-indigo-500 ring-indigo-500' : '' }}
-                                                {{ $movement->status === 'Actioned' ? 'bg-green-500 ring-green-500' : '' }}
-                                                shadow-sm">
-                                            </div>
-                                            <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden print:shadow-none print:rounded-none">
-                                                <div class="px-4 py-2 border-b border-gray-50 flex items-center justify-between
-                                                    {{ $movement->status === 'Pending' ? 'bg-yellow-50/30' : '' }}
-                                                    {{ $movement->status === 'Actioned' ? 'bg-green-50/30' : '' }}">
-                                                    <div class="flex items-center gap-2">
-                                                        <div class="hidden sm:flex w-7 h-7 rounded-full bg-blue-100 items-center justify-center text-blue-700 text-xs font-bold">
-                                                            {{ strtoupper(substr($movement->fromUser?->name ?? 'S', 0, 1)) }}
-                                                        </div>
-                                                        <div>
-                                                            <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                                                                {{ $movement->action }} | Seq #{{ $movement->sequence }}
-                                                            </div>
-                                                            <div class="text-sm font-bold text-gray-900 leading-tight">
-                                                                {{ $movement->fromUser?->name ?? 'System' }}
-                                                                <span class="text-gray-400 font-normal mx-1">→</span>
-                                                                {{ $movement->toUser?->name ?? 'Everyone' }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-right">
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase
-                                                            {{ $movement->status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                                            {{ $movement->status === 'Received' ? 'bg-blue-100 text-blue-800' : '' }}
-                                                            {{ $movement->status === 'Reviewed' ? 'bg-indigo-100 text-indigo-800' : '' }}
-                                                            {{ $movement->status === 'Actioned' ? 'bg-green-100 text-green-800' : '' }}">
-                                                            {{ $movement->status }}
-                                                        </span>
-                                                        <div class="text-[10px] text-gray-400 mt-0.5">{{ $movement->created_at->format('d-M-Y H:i') }}</div>
-                                                    </div>
-                                                </div>
-                                                @if($movement->instructions)
-                                                <div class="px-4 py-2 bg-blue-50/50 border-t border-blue-100 text-sm italic text-gray-700">
-                                                    "{{ $movement->instructions }}"
-                                                </div>
-                                                @endif
-                                                @if($movement->isPending() && $movement->to_user_id === auth()->id())
-                                                <div class="px-4 py-2 border-t border-gray-50">
-                                                    <form method="POST" action="{{ route('correspondence.movement.update', $correspondence) }}" class="inline">
-                                                        @csrf
-                                                        <input type="hidden" name="movement_id" value="{{ $movement->id }}">
-                                                        <input type="hidden" name="action" value="receive">
-                                                        <button type="submit" class="text-[10px] font-bold uppercase px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                                            Mark Received
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                                @elseif($movement->status === 'Received' && $movement->to_user_id === auth()->id())
-                                                <div class="px-4 py-2 border-t border-gray-50">
-                                                    <form method="POST" action="{{ route('correspondence.movement.update', $correspondence) }}" class="inline">
-                                                        @csrf
-                                                        <input type="hidden" name="movement_id" value="{{ $movement->id }}">
-                                                        <input type="hidden" name="action" value="review">
-                                                        <button type="submit" class="text-[10px] font-bold uppercase px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">
-                                                            Mark Reviewed
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
+                            <div class="overflow-x-auto max-h-[500px] overflow-y-auto print:max-h-none">
+                                <table class="info-table w-full">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%;">Seq</th>
+                                            <th style="width: 12%;">Date/Time</th>
+                                            <th style="width: 12%;">From</th>
+                                            <th style="width: 12%;">To</th>
+                                            <th style="width: 12%;">Action</th>
+                                            <th style="width: 10%;">Status</th>
+                                            <th style="width: 37%;">Instructions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($correspondence->movements->sortByDesc('created_at') as $movement)
+                                            <tr>
+                                                <td class="text-center font-bold">{{ $movement->sequence }}</td>
+                                                <td>{{ $movement->created_at->format('d-M-Y H:i') }}</td>
+                                                <td>{{ $movement->fromUser?->name ?? 'System' }}</td>
+                                                <td>{{ $movement->toUser?->name ?? 'Everyone' }}</td>
+                                                <td>{{ $movement->action }}</td>
+                                                <td>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase no-print
+                                                        {{ $movement->status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                                        {{ $movement->status === 'Received' ? 'bg-blue-100 text-blue-800' : '' }}
+                                                        {{ $movement->status === 'Reviewed' ? 'bg-indigo-100 text-indigo-800' : '' }}
+                                                        {{ $movement->status === 'Actioned' ? 'bg-green-100 text-green-800' : '' }}">
+                                                        {{ $movement->status }}
+                                                    </span>
+                                                    <span class="hidden print:inline">{{ $movement->status }}</span>
+                                                </td>
+                                                <td>
+                                                    {{ $movement->instructions ?? '-' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         @else
                             <div class="text-center py-8">
@@ -705,32 +669,39 @@
                     {{-- Comments Tab --}}
                     <div x-show="activeTab === 'comments'" style="display: none;" class="print-section">
                         <h4 class="hidden print:block font-bold text-sm mb-2 border-b border-black pb-1">COMMENTS</h4>
-                        <div class="space-y-3 max-h-[400px] overflow-y-auto print:max-h-none print:overflow-visible print:space-y-1">
-                            @php $hasComments = false; @endphp
-                            @foreach($correspondence->movements as $movement)
-                                @foreach($movement->comments as $comment)
-                                    @php $hasComments = true; @endphp
-                                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 print:p-1 print:bg-white print:rounded-none print:border-gray-300 print-comment-item">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <div class="flex items-center">
-                                                <div class="w-6 h-6 rounded-full bg-blue-800 flex items-center justify-center text-[10px] text-white font-bold mr-2 no-print">
-                                                    {{ strtoupper(substr($comment->user?->name ?? 'U', 0, 1)) }}
-                                                </div>
-                                                <span class="text-xs font-bold text-gray-900 print:text-[9pt]">{{ $comment->user?->name ?? 'Unknown' }}</span>
-                                            </div>
-                                            <span class="text-[10px] text-gray-400 print:text-[8pt] print:text-black">{{ $comment->created_at->format('d-M-Y H:i') }}</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 ml-8 print:ml-0 print:text-[9pt] print:text-black">{{ $comment->comment }}</p>
-                                        <div class="mt-1 ml-8 print:ml-0 text-[10px] text-blue-600 font-bold uppercase print:text-[8pt] print:text-black">Movement #{{ $movement->sequence }}</div>
-                                    </div>
-                                @endforeach
-                            @endforeach
-                            @if(!$hasComments)
-                                <div class="text-center py-8">
-                                    <p class="text-gray-400 text-sm italic">No comments found.</p>
-                                </div>
-                            @endif
-                        </div>
+                        @php $hasComments = false; @endphp
+                        @if($correspondence->movements->sum(fn($m) => $m->comments->count()) > 0)
+                            <div class="overflow-x-auto max-h-[400px] overflow-y-auto print:max-h-none">
+                                <table class="info-table w-full">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 12%;">Date/Time</th>
+                                            <th style="width: 15%;">User</th>
+                                            <th style="width: 10%;">Movement #</th>
+                                            <th style="width: 63%;">Comment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($correspondence->movements as $movement)
+                                            @foreach($movement->comments as $comment)
+                                                @php $hasComments = true; @endphp
+                                                <tr>
+                                                    <td>{{ $comment->created_at->format('d-M-Y H:i') }}</td>
+                                                    <td>{{ $comment->user?->name ?? 'Unknown' }}</td>
+                                                    <td class="text-center font-bold">{{ $movement->sequence }}</td>
+                                                    <td>{{ $comment->comment }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                        @if(!$hasComments)
+                            <div class="text-center py-8">
+                                <p class="text-gray-400 text-sm italic">No comments found.</p>
+                            </div>
+                        @endif
                     </div>
 
                     {{-- Mark To Tab (inline form, previously modal) --}}
