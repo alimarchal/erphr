@@ -24,8 +24,6 @@ Route::middleware(['auth'])->group(function () {
         return view('settings.index');
     })->name('settings.index');
 
-    Route::redirect('settings', 'settings/profile');
-
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');

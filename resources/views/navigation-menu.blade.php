@@ -28,23 +28,9 @@
                         </x-nav-link>
                     @endcan
 
-                    @can('view users')
-                        <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
-                            {{ __('Users') }}
-                        </x-nav-link>
-                    @endcan
-
-                    @can('view roles')
-                        <x-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
-                            {{ __('Roles') }}
-                        </x-nav-link>
-                    @endcan
-
-                    @can('view permissions')
-                        <x-nav-link href="{{ route('permissions.index') }}" :active="request()->routeIs('permissions.*')">
-                            {{ __('Permissions') }}
-                        </x-nav-link>
-                    @endcan
+                    <x-nav-link href="{{ route('settings.index') }}" :active="request()->routeIs('settings.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('correspondence-categories.*') || request()->routeIs('divisions.*')">
+                        {{ __('Settings') }}
+                    </x-nav-link>
 
                     @role('super-admin')
                     <x-nav-link href="{{ route('admin.activity-logs') }}"
@@ -206,24 +192,9 @@
                 </x-responsive-nav-link>
             @endcan
 
-            @can('view users')
-                <x-responsive-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
-                    {{ __('Users') }}
-                </x-responsive-nav-link>
-            @endcan
-
-            @can('view roles')
-                <x-responsive-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
-                    {{ __('Roles') }}
-                </x-responsive-nav-link>
-            @endcan
-
-            @can('view permissions')
-                <x-responsive-nav-link href="{{ route('permissions.index') }}"
-                    :active="request()->routeIs('permissions.*')">
-                    {{ __('Permissions') }}
-                </x-responsive-nav-link>
-            @endcan
+            <x-responsive-nav-link href="{{ route('settings.index') }}" :active="request()->routeIs('settings.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('correspondence-categories.*') || request()->routeIs('divisions.*')">
+                {{ __('Settings') }}
+            </x-responsive-nav-link>
 
             @role('super-admin')
             <x-responsive-nav-link href="{{ route('admin.activity-logs') }}"
