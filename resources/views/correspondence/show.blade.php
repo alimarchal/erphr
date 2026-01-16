@@ -353,7 +353,7 @@
             <x-status-message class="mb-4" />
 
             <!-- Correspondence Information Section -->
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-6">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-8">
                             <!-- Print & Screen Header -->
 
             <div class="print-header">
@@ -502,7 +502,7 @@
             </div>
 
             <!-- Activity & Actions Section -->
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6" x-data="{ activeTab: 'timeline' }">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-8" x-data="{ activeTab: 'timeline' }">
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-200">
                     <h3 class="text-lg font-bold text-gray-900 print-section-title">Activity & Actions</h3>
                     
