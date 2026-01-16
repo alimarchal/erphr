@@ -313,9 +313,21 @@
                                 <th>Branch</th>
                                 <td>{{ $correspondence->branch?->name ?? 'N/A' }}</td>
                                 <th>Marked To</th>
-                                <td>{{ $correspondence->markedTo?->name ?? 'N/A' }}</td>
+                                <td>
+                                    @if($correspondence->markedTo)
+                                        {{ $correspondence->markedTo->name }}{{ $correspondence->markedTo->designation ? " ({$correspondence->markedTo->designation})" : '' }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
                                 <th>Addressed To</th>
-                                <td>{{ $correspondence->addressedTo?->name ?? 'N/A' }}</td>
+                                <td>
+                                    @if($correspondence->addressedTo)
+                                        {{ $correspondence->addressedTo->name }}{{ $correspondence->addressedTo->designation ? " ({$correspondence->addressedTo->designation})" : '' }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
                             </tr>
                             <tr>
                                 <th>Current Holder</th>
@@ -636,7 +648,7 @@
                                     <select id="to_user_id" name="to_user_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Select Person</option>
                                         @foreach($users as $user)
-                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            <option value="{{ $user->id }}">{{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -801,7 +813,7 @@
                         <select id="to_user_id" name="to_user_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                             <option value="">Select Person</option>
                             @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                <option value="{{ $user->id }}">{{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}</option>
                             @endforeach
                         </select>
                     </div>
