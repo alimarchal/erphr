@@ -39,17 +39,24 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 
-    // Divisions CRUD
-    Route::resource('settings/divisions', DivisionController::class)->names('divisions');
+    // Settings Group
+    Route::prefix('settings')->group(function () {
+        // Divisions CRUD
+        Route::resource('divisions', DivisionController::class)->names('divisions');
 
-    // Correspondence Categories CRUD
-    Route::resource('correspondence-categories', \App\Http\Controllers\CorrespondenceCategoryController::class);
-    Route::patch('correspondence-categories/{category}/toggle', [\App\Http\Controllers\CorrespondenceCategoryController::class, 'toggle'])->name('correspondence-categories.toggle');
+        // Correspondence Categories CRUD
+        Route::resource('correspondence-categories', \App\Http\Controllers\CorrespondenceCategoryController::class);
+        Route::patch('correspondence-categories/{category}/toggle', [\App\Http\Controllers\CorrespondenceCategoryController::class, 'toggle'])->name('correspondence-categories.toggle');
 
-    // User Management
-    Route::resource('users', UserController::class);
-    Route::resource('roles', RoleController::class);
-    Route::resource('permissions', PermissionController::class);
+        // Letter Types CRUD
+        Route::resource('letter-types', \App\Http\Controllers\LetterTypeController::class);
+        Route::patch('letter-types/{letterType}/toggle', [\App\Http\Controllers\LetterTypeController::class, 'toggle'])->name('letter-types.toggle');
+
+        // User Management
+        Route::resource('users', UserController::class);
+        Route::resource('roles', RoleController::class);
+        Route::resource('permissions', PermissionController::class);
+    });
 
     // Admin Activity Logs
     Volt::route('admin/activity-logs', 'admin.activity-log-viewer')

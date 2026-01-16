@@ -88,23 +88,44 @@
                     </div>
                 @endcan
 
-                <!-- Divisions Management Card -->
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg hover:shadow-2xl transition-shadow">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900">Divisions</h3>
-                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
-                            </svg>
+                <!-- Letter Types Management Card -->
+                @can('manage letter types')
+                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg hover:shadow-2xl transition-shadow">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Letter Types</h3>
+                                <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">Manage letter types and set reply requirements for correspondence tracking.</p>
+                            <a href="{{ route('letter-types.index') }}" class="inline-block">
+                                <x-button>Manage Letter Types</x-button>
+                            </a>
                         </div>
-                        <p class="text-gray-600 text-sm mb-4">Manage organizational divisions for correspondence routing
-                            and tracking.</p>
-                        <a href="{{ route('divisions.index') }}" class="inline-block">
-                            <x-button>Manage Divisions</x-button>
-                        </a>
                     </div>
-                </div>
+                @endcan
+
+                <!-- Divisions Management Card -->
+                @can('manage divisions')
+                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg hover:shadow-2xl transition-shadow">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Divisions</h3>
+                                <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">Manage organizational divisions for correspondence routing
+                                and tracking.</p>
+                            <a href="{{ route('divisions.index') }}" class="inline-block">
+                                <x-button>Manage Divisions</x-button>
+                            </a>
+                        </div>
+                    </div>
+                @endcan
             </div>
         </div>
     </div>
