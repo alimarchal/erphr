@@ -197,6 +197,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             $correspondence = Correspondence::create($data);
 
             // Create initial movement if marked to someone
+            // If Receipt with marked_to_user_id, create initial movement
             if (! empty($data['marked_to_user_id'])) {
                 $movement = $correspondence->movements()->create([
                     'from_user_id' => auth()->id(),
@@ -215,7 +216,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             }
 
             // If Receipt with Divisional Head sender designation, create auto-movement to DH HR
-            if ($data['type'] === 'Receipt' && $data['sender_designation'] === 'Divisional Head') {
+            if ($data['type'] === 'Receipt' && ($data['sender_designation'] ?? null) === 'Divisional Head') {
                 // Find Divisional Head HR user by designation
                 $divisionHead = User::where('designation', 'Divisional Head HR')
                     ->orWhere('designation', 'like', '%Divisional Head%HR%')

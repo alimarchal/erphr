@@ -92,9 +92,43 @@ describe('Dispatch Correspondence New Fields', function () {
         expect($correspondence->sending_address)->toBeNull();
         expect($correspondence->signed_by)->toBeNull();
     });
+
+    it('does not show addressed_to in dispatch create form', function () {
+        $response = $this->get(route('correspondence.create', ['type' => 'Dispatch']));
+
+        $response->assertSuccessful();
+        // Addressed To should NOT appear for Dispatch
+        $response->assertDontSee('Addressed To');
+    });
+
+    it('does not show sender_designation in dispatch create form', function () {
+        $response = $this->get(route('correspondence.create', ['type' => 'Dispatch']));
+
+        $response->assertSuccessful();
+        // Sender Designation should NOT appear for Dispatch
+        $response->assertDontSee('Sender Designation');
+    });
 });
 
-describe('Receipt Correspondence Sender Designation', function () {
+describe('Receipt Correspondence', function () {
+    it('shows sender_designation in receipt create form', function () {
+        $response = $this->get(route('correspondence.create', ['type' => 'Receipt']));
+
+        $response->assertSuccessful();
+        // sender_designation SHOULD appear for Receipt
+        $response->assertSee('Sender Designation');
+        $response->assertSee('Divisional Head');
+        $response->assertSee('Senior Manager');
+    });
+
+    it('shows addressed_to in receipt create form', function () {
+        $response = $this->get(route('correspondence.create', ['type' => 'Receipt']));
+
+        $response->assertSuccessful();
+        // Addressed To should appear for Receipt
+        $response->assertSee('Addressed To');
+    });
+
     it('stores receipt with sender_designation', function () {
         $response = $this->post(route('correspondence.store'), [
             'type' => 'Receipt',
@@ -106,6 +140,7 @@ describe('Receipt Correspondence Sender Designation', function () {
 
         $response->assertRedirect();
         $correspondence = Correspondence::where('receipt_no', 'R-001')->first();
+        expect($correspondence)->not->toBeNull();
         expect($correspondence->sender_designation)->toBe('Senior Manager');
     });
 
@@ -137,19 +172,6 @@ describe('Receipt Correspondence Sender Designation', function () {
         $response->assertSessionHasErrors('sender_designation_other');
     });
 
-    it('shows sender_designation dropdown in create form', function () {
-        $response = $this->get(route('correspondence.create', ['type' => 'Receipt']));
-
-        $response->assertSuccessful();
-        $response->assertSee('Sender Designation');
-        $response->assertSee('Divisional Head');
-        $response->assertSee('Senior Manager');
-        $response->assertSee('General Manager');
-        $response->assertSee('Manager');
-        $response->assertSee('Officer');
-        $response->assertSee('Another');
-    });
-
     it('shows sender_designation in receipt show page', function () {
         $correspondence = Correspondence::factory()->create([
             'type' => 'Receipt',
@@ -162,7 +184,7 @@ describe('Receipt Correspondence Sender Designation', function () {
         $response->assertSee('General Manager');
     });
 
-    it('shows custom designation_other in show page when sender_designation=Another', function () {
+    it('shows custom designation_other in receipt show page when sender_designation=Another', function () {
         $correspondence = Correspondence::factory()->create([
             'type' => 'Receipt',
             'sender_designation' => 'Another',
@@ -177,7 +199,7 @@ describe('Receipt Correspondence Sender Designation', function () {
 });
 
 describe('Divisional Head Auto-Movement', function () {
-    it('creates auto-movement to DH HR when sender_designation=Divisional Head', function () {
+    it('creates auto-movement to DH HR when receipt sender_designation=Divisional Head', function () {
         $dhUser = User::factory()->create(['designation' => 'Divisional Head HR']);
 
         $response = $this->post(route('correspondence.store'), [

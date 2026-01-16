@@ -93,18 +93,20 @@
                 :value="old('letter_date', $correspondence?->letter_date?->format('Y-m-d'))" />
         </div>
 
-        <div>
-            <x-label for="addressed_to_user_id" value="Addressed To" />
-            <select id="addressed_to_user_id" name="addressed_to_user_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">None</option>
-                @foreach($users as $user)
-                    <option value="{{ $user->id }}"
-                        {{ old('addressed_to_user_id', $correspondence?->addressed_to_user_id) == $user->id ? 'selected' : '' }}>
-                        {{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+        @if($isReceipt)
+            <div>
+                <x-label for="addressed_to_user_id" value="Addressed To" />
+                <select id="addressed_to_user_id" name="addressed_to_user_id" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="">None</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}"
+                            {{ old('addressed_to_user_id', $correspondence?->addressed_to_user_id) == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }}{{ $user->designation ? " ({$user->designation})" : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
