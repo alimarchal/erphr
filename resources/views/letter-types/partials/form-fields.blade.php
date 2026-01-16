@@ -5,14 +5,12 @@
 
 <div>
     <x-label for="name" value="Letter Type Name" :required="true" />
-    <x-input id="name" type="text" name="name" class="mt-1 block w-full"
-        :value="old('name', optional($letterType)->name)" required autofocus placeholder="e.g., Urgent Letter" />
+    <x-input id="name" type="text" name="name" class="mt-1 block w-full" :value="old('name', optional($letterType)->name)" required autofocus placeholder="e.g., Urgent Letter" />
 </div>
 
 <div class="mt-4">
     <x-label for="code" value="Code" :required="true" />
-    <x-input id="code" type="text" name="code" class="mt-1 block w-full"
-        :value="old('code', optional($letterType)->code)" required placeholder="e.g., UL" maxlength="50" />
+    <x-input id="code" type="text" name="code" class="mt-1 block w-full" :value="old('code', optional($letterType)->code)" required placeholder="e.g., UL" maxlength="50" />
     <p class="text-xs text-gray-500 mt-1">Required: A unique code to identify the letter type</p>
 </div>
 
