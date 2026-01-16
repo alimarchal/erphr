@@ -7,6 +7,127 @@
         />
     </x-slot>
 
+    <style>
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 1cm;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background-color: white !important;
+                color: black !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .max-w-7xl {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .bg-white, .sm\:rounded-lg, .shadow-xl, .shadow, .rounded-lg, .rounded-md, .rounded-full {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                background: white !important;
+            }
+
+            .py-6, .py-12, .p-6, .p-8, .px-4, .px-6, .px-8, .sm\:px-6, .lg\:px-8 {
+                padding: 0 !important;
+            }
+
+            .mb-6, .mb-8, .mb-4 {
+                margin-bottom: 0.5rem !important;
+            }
+
+            /* Remove all colors for laser printing */
+            .bg-blue-50, .bg-yellow-50, .bg-green-50, .bg-gray-50, .bg-purple-50, .bg-orange-50, .bg-indigo-50, .bg-teal-50,
+            .bg-red-50, .bg-blue-100, .bg-gray-100, .bg-red-600, .bg-purple-600 {
+                background-color: white !important;
+            }
+
+            .text-blue-700, .text-yellow-700, .text-green-700, .text-gray-700, .text-purple-700, .text-orange-700,
+            .text-indigo-700, .text-teal-700, .text-red-700, .text-blue-600, .text-white {
+                color: black !important;
+            }
+
+            .border-blue-100, .border-yellow-100, .border-green-100, .border-gray-100, .border-purple-100,
+            .border-orange-100, .border-indigo-100, .border-teal-100, .border-red-100 {
+                border-color: black !important;
+            }
+
+            /* Table print styles */
+            .info-table {
+                width: 100% !important;
+                page-break-inside: auto;
+            }
+
+            .info-table tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            .info-table th, .info-table td {
+                border: 1px solid black !important;
+                padding: 4px 6px !important;
+                font-size: 10pt !important;
+            }
+
+            .animate-pulse {
+                animation: none !important;
+            }
+        }
+
+        /* Screen styles for table */
+        .info-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .info-table th {
+            background-color: #f9fafb;
+            font-weight: bold;
+            text-align: left;
+            white-space: nowrap;
+            color: #000;
+        }
+
+        .info-table td {
+            font-weight: normal;
+            color: #000;
+        }
+
+        .info-table th, .info-table td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
+
+        .section-header {
+            background-color: transparent !important;
+            color: black !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            text-align: center !important;
+            padding: 4px 6px !important;
+        }
+
+        @media print {
+            .section-header {
+                background-color: transparent !important;
+                color: black !important;
+            }
+        }
+    </style>
+
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <x-status-message class="mb-4" />
@@ -56,9 +177,16 @@
                     </div>
 
                     <div class="flex items-center space-x-2">
+                        <button type="button" onclick="window.print()"
+                                class="no-print inline-flex items-center px-4 py-2 bg-gray-800 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-gray-900 transition">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            Print
+                        </button>
                         @can('edit correspondence')
                         <a href="{{ route('correspondence.edit', $correspondence) }}"
-                           class="inline-flex items-center px-4 py-2 bg-blue-800 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-900 transition">
+                           class="no-print inline-flex items-center px-4 py-2 bg-blue-800 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-900 transition">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
@@ -67,7 +195,7 @@
                         @endcan
                         @can('mark correspondence')
                         <button type="button" onclick="document.getElementById('mark-modal').classList.remove('hidden')"
-                                class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-green-700 transition">
+                                class="no-print inline-flex items-center px-4 py-2 bg-green-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-green-700 transition">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
@@ -77,129 +205,141 @@
                     </div>
                 </div>
 
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {{-- Section 1: Basic Details --}}
-                        <div>
-                            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-4 border-b border-blue-100 pb-1">Basic Details</h4>
-                            <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                                @if($correspondence->isReceipt())
-                                    <dt class="text-gray-500">Receipt No:</dt>
-                                    <dd class="font-bold text-gray-900">{{ $correspondence->receipt_no ?? '-' }}</dd>
-                                @else
-                                    <dt class="text-gray-500">Dispatch No:</dt>
-                                    <dd class="font-bold text-gray-900">{{ $correspondence->dispatch_no ?? '-' }}</dd>
-                                @endif
+                <div class="p-2">
+                    <table class="info-table">
+                        <tbody>
+                            {{-- Basic Details Section --}}
+                            <tr>
+                                <th colspan="6" class="section-header">Basic Details</th>
+                            </tr>
+                            <tr>
+                                <th style="width: 16.67%;">{{ $correspondence->isReceipt() ? 'Receipt No' : 'Dispatch No' }}</th>
+                                <td style="width: 16.67%;">{{ $correspondence->isReceipt() ? ($correspondence->receipt_no ?? 'N/A') : ($correspondence->dispatch_no ?? 'N/A') }}</td>
+                                <th style="width: 16.67%;">Register No</th>
+                                <td style="width: 16.67%;">{{ $correspondence->register_number ?? 'N/A' }}</td>
+                                <th style="width: 16.67%;">Type</th>
+                                <td style="width: 16.67%;">{{ $correspondence->type ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Letter Type</th>
+                                <td>{{ $correspondence->letterType?->name ?? 'N/A' }}</td>
+                                <th>Category</th>
+                                <td>{{ $correspondence->category?->name ?? 'N/A' }}</td>
+                                <th>Letter Date</th>
+                                <td>{{ $correspondence->letter_date?->format('d-M-Y') ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ $correspondence->isReceipt() ? 'Received Date' : 'Dispatch Date' }}</th>
+                                <td>{{ $correspondence->isReceipt() ? ($correspondence->received_date?->format('d-M-Y') ?? 'N/A') : ($correspondence->dispatch_date?->format('d-M-Y') ?? 'N/A') }}</td>
+                                <th>Reference Number</th>
+                                <td colspan="3">{{ $correspondence->reference_number ?? 'N/A' }}</td>
+                            </tr>
 
-                                <dt class="text-gray-500">Register No:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->register_number }}</dd>
-
-                                <dt class="text-gray-500">Type:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->type }}</dd>
-
-                                <dt class="text-gray-500">Letter Type:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->letterType?->name ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Category:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->category?->name ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Letter Date:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->letter_date?->format('d-M-Y') ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">{{ $correspondence->isReceipt() ? 'Received' : 'Dispatch' }} Date:</dt>
-                                <dd class="font-bold text-gray-900">
-                                    {{ $correspondence->isReceipt() ? $correspondence->received_date?->format('d-M-Y') : $correspondence->dispatch_date?->format('d-M-Y') }}
-                                </dd>
-
-                                <dt class="text-gray-500">Ref Number:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->reference_number ?? '-' }}</dd>
-                            </dl>
-                        </div>
-
-                        {{-- Section 2: Source & Destination --}}
-                        <div>
-                            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-4 border-b border-blue-100 pb-1">Source & Destination</h4>
-                            <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                                <dt class="text-gray-500">{{ $correspondence->isReceipt() ? 'From' : 'To' }} (External):</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->sender_name ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Division:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->toDivision?->name ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Marked to:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->markedTo?->name ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Addressed To:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->addressedTo?->name ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Current Holder:</dt>
-                                <dd class="font-bold text-blue-700">
+                            {{-- Source & Destination Section --}}
+                            <tr>
+                                <th colspan="6" class="section-header">Source & Destination</th>
+                            </tr>
+                            <tr>
+                                <th>External Party (Sender/Recipient)</th>
+                                <td>{{ $correspondence->sender_name ?? 'N/A' }}</td>
+                                <th>From Division (Internal)</th>
+                                <td>{{ $correspondence->fromDivision?->name ?? 'N/A' }}</td>
+                                <th>Region</th>
+                                <td>{{ $correspondence->region?->name ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Branch</th>
+                                <td>{{ $correspondence->branch?->name ?? 'N/A' }}</td>
+                                <th>Marked To</th>
+                                <td>{{ $correspondence->markedTo?->name ?? 'N/A' }}</td>
+                                <th>Addressed To</th>
+                                <td>{{ $correspondence->addressedTo?->name ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Current Holder</th>
+                                <td>
                                     {{ $correspondence->currentHolder?->name ?? 'Not assigned' }}
                                     @if($correspondence->current_holder_since)
-                                        <div class="text-[10px] text-gray-400 font-normal">Since {{ $correspondence->current_holder_since->format('d-M-Y H:i') }}</div>
+                                        <br><small class="text-gray-500">(Since {{ $correspondence->current_holder_since->format('d-M-Y H:i') }})</small>
                                     @endif
-                                </dd>
+                                </td>
+                                <th>Due Date</th>
+                                <td>{{ $correspondence->due_date?->format('d-M-Y') ?? 'N/A' }}</td>
+                                <th>Days Open</th>
+                                <td>{{ $correspondence->days_open ?? 0 }} days</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>{{ $correspondence->status?->name ?? 'N/A' }}</td>
+                                <th>Priority</th>
+                                <td>{{ $correspondence->priority?->name ?? 'N/A' }}</td>
+                                <th>Confidentiality</th>
+                                <td>{{ $correspondence->confidentiality ?? 'Normal' }}</td>
+                            </tr>
 
-                                <dt class="text-gray-500">Due Date:</dt>
-                                <dd class="font-bold {{ $correspondence->isOverdue() ? 'text-red-600' : 'text-gray-900' }}">
-                                    {{ $correspondence->due_date?->format('d-M-Y') ?? '-' }}
-                                </dd>
+                            {{-- Delivery & Record Info Section --}}
+                            <tr>
+                                <th colspan="6" class="section-header">Delivery & Record Info</th>
+                            </tr>
+                            <tr>
+                                <th>Delivery Mode</th>
+                                <td>{{ $correspondence->delivery_mode ?? 'N/A' }}</td>
+                                <th>Courier Name</th>
+                                <td>{{ $correspondence->courier_name ?? 'N/A' }}</td>
+                                <th>Tracking Number</th>
+                                <td>{{ $correspondence->courier_tracking ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Created By</th>
+                                <td>
+                                    {{ $correspondence->creator?->name ?? 'N/A' }}
+                                    @if($correspondence->created_at)
+                                        <br><small class="text-gray-500">{{ $correspondence->created_at->format('d-M-Y H:i') }}</small>
+                                    @endif
+                                </td>
+                                <th>Last Updated By</th>
+                                <td colspan="3">
+                                    {{ $correspondence->updater?->name ?? 'N/A' }}
+                                    @if($correspondence->updated_at)
+                                        <span class="text-gray-500"> - {{ $correspondence->updated_at->format('d-M-Y H:i') }}</span>
+                                    @endif
+                                </td>
+                            </tr>
 
-                                <dt class="text-gray-500">Days Open:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->days_open }} days</dd>
-                            </dl>
-                        </div>
+                            {{-- Subject Section --}}
+                            <tr>
+                                <th colspan="6" class="section-header">Subject</th>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="padding: 12px;"><strong>{{ $correspondence->subject ?? 'N/A' }}</strong></td>
+                            </tr>
 
-                        {{-- Section 3: Delivery & Record Info --}}
-                        <div>
-                            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-4 border-b border-blue-100 pb-1">Delivery & Record Info</h4>
-                            <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                                <dt class="text-gray-500">Delivery Mode:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->delivery_mode ?? '-' }}</dd>
+                            {{-- Description Section --}}
+                            @if($correspondence->description)
+                            <tr>
+                                <th colspan="6" class="section-header">Description</th>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="padding: 12px; line-height: 1.6;">{{ $correspondence->description }}</td>
+                            </tr>
+                            @endif
 
-                                <dt class="text-gray-500">Courier:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->courier_name ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Tracking No:</dt>
-                                <dd class="font-bold text-gray-900">{{ $correspondence->courier_tracking ?? '-' }}</dd>
-
-                                <dt class="text-gray-500">Created By:</dt>
-                                <dd class="font-bold text-gray-900">
-                                    {{ $correspondence->creator?->name ?? '-' }}
-                                    <div class="text-[10px] text-gray-400 font-normal">{{ $correspondence->created_at?->format('d-M-Y H:i') }}</div>
-                                </dd>
-
-                                <dt class="text-gray-500">Last Updated:</dt>
-                                <dd class="font-bold text-gray-900">
-                                    {{ $correspondence->updater?->name ?? '-' }}
-                                    <div class="text-[10px] text-gray-400 font-normal">{{ $correspondence->updated_at?->format('d-M-Y H:i') }}</div>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-
-                    {{-- Subject & Description --}}
-                    <div class="mt-8 pt-6 border-t border-gray-100">
-                        <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2">Subject</h4>
-                        <p class="text-xl font-bold text-gray-900 leading-tight">{{ $correspondence->subject }}</p>
-                        
-                        @if($correspondence->description)
-                            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mt-6 mb-2">Description</h4>
-                            <div class="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                {{ $correspondence->description }}
-                            </div>
-                        @endif
-
-                        @if($correspondence->remarks)
-                            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mt-6 mb-2">Remarks</h4>
-                            <p class="text-sm text-gray-600 italic">{{ $correspondence->remarks }}</p>
-                        @endif
-                    </div>
+                            {{-- Remarks Section --}}
+                            @if($correspondence->remarks)
+                            <tr>
+                                <th colspan="6" class="section-header">Remarks</th>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="padding: 12px; font-style: italic;">{{ $correspondence->remarks }}</td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             {{-- Quick Actions: Status & Comment --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 no-print">
                 {{-- Status Update Card --}}
                 <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden border border-blue-100 h-full">
                     <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
@@ -259,7 +399,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
                 {{-- Movement Trail with Tabs --}}
                 <div class="lg:col-span-2" x-data="{ activeTab: 'timeline' }">
                     <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden">
@@ -585,7 +725,7 @@
     </div>
 
     {{-- Mark To Modal --}}
-    <div id="mark-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div id="mark-modal" class="no-print hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-10 mx-auto p-6 border w-full max-w-3xl shadow-lg rounded-lg bg-white">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-semibold text-gray-900">Mark Correspondence</h3>
