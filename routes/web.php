@@ -49,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('correspondence-categories/{category}/toggle', [\App\Http\Controllers\CorrespondenceCategoryController::class, 'toggle'])->name('correspondence-categories.toggle');
 
         // Letter Types CRUD
-        Route::resource('letter-types', \App\Http\Controllers\LetterTypeController::class);
+        Route::resource('letter-types', \App\Http\Controllers\LetterTypeController::class)->except('destroy');
         Route::patch('letter-types/{letterType}/toggle', [\App\Http\Controllers\LetterTypeController::class, 'toggle'])->name('letter-types.toggle');
 
         // User Management

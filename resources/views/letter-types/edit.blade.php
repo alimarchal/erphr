@@ -1,6 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-page-header title="Edit Letter Type" backRoute="letter-types.index" />
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight inline-block">
+            Edit Letter Type: {{ $letterType->name }}
+        </h2>
+        <div class="flex justify-center items-center float-right">
+            <a href="{{ route('letter-types.index') }}"
+                class="inline-flex items-center ml-2 px-4 py-2 bg-blue-950 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 focus:bg-green-800 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-6">
@@ -66,7 +78,7 @@
                         <a href="{{ route('letter-types.index') }}" class="inline-block">
                             <x-secondary-button>Cancel</x-secondary-button>
                         </a>
-                        <x-button type="submit">Update Letter Type</x-button>
+                        <x-button type="submit">Update</x-button>
                     </div>
                 </form>
             </div>

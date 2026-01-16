@@ -96,10 +96,12 @@
                                 <h3 class="text-lg font-semibold text-gray-900">Letter Types</h3>
                                 <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                    </path>
                                 </svg>
                             </div>
-                            <p class="text-gray-600 text-sm mb-4">Manage letter types and set reply requirements for correspondence tracking.</p>
+                            <p class="text-gray-600 text-sm mb-4">Manage letter types and set reply requirements for
+                                correspondence tracking.</p>
                             <a href="{{ route('letter-types.index') }}" class="inline-block">
                                 <x-button>Manage Letter Types</x-button>
                             </a>

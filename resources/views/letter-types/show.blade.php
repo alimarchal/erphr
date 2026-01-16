@@ -1,89 +1,89 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-page-header title="{{ $letterType->name }}" backRoute="letter-types.index" />
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight inline-block">
+            View Letter Type: {{ $letterType->name }}
+        </h2>
+        <div class="flex justify-center items-center float-right">
+            <a href="{{ route('letter-types.index') }}"
+                class="inline-flex items-center ml-2 px-4 py-2 bg-blue-950 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 focus:bg-green-800 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <x-status-message class="mb-4 mt-4" />
                 <div class="p-6">
-                    <div class="space-y-6">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Basic Information</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-600">Name</p>
-                                    <p class="text-lg font-semibold text-gray-900">{{ $letterType->name }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600">Code</p>
-                                    <p class="text-lg font-semibold text-indigo-600">{{ $letterType->code }}</p>
-                                </div>
+                    <form>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <x-label for="name" value="Name" />
+                                <x-input id="name" type="text" name="name"
+                                    class="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                    :value="$letterType->name" disabled readonly />
+                            </div>
+
+                            <div>
+                                <x-label for="code" value="Code" />
+                                <x-input id="code" type="text" name="code"
+                                    class="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                    :value="$letterType->code" disabled readonly />
                             </div>
                         </div>
 
-                        <div class="border-t pt-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Settings</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-600">Requires Reply</p>
-                                    @if($letterType->requires_reply)
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700 mt-1">
-                                            Yes
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700 mt-1">
-                                            No
-                                        </span>
-                                    @endif
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600">Default Days to Reply</p>
-                                    <p class="text-lg font-semibold text-gray-900 mt-1">
-                                        {{ $letterType->default_days_to_reply ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600">Status</p>
-                                    @if($letterType->is_active)
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700 mt-1">
-                                            Active
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700 mt-1">
-                                            Inactive
-                                        </span>
-                                    @endif
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <x-label for="requires_reply" value="Requires Reply" />
+                                <x-input id="requires_reply" type="text" name="requires_reply"
+                                    class="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                    :value="$letterType->requires_reply ? 'Yes' : 'No'" disabled readonly />
+                            </div>
+
+                            <div>
+                                <x-label for="default_days_to_reply" value="Default Days to Reply" />
+                                <x-input id="default_days_to_reply" type="text" name="default_days_to_reply"
+                                    class="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                    :value="$letterType->default_days_to_reply ?? '-'" disabled readonly />
                             </div>
                         </div>
 
-                        <div class="border-t pt-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Audit Information</h3>
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <p class="text-gray-600">Created At</p>
-                                    <p class="font-semibold text-gray-900">{{ $letterType->created_at->format('M d, Y H:i') }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600">Updated At</p>
-                                    <p class="font-semibold text-gray-900">{{ $letterType->updated_at->format('M d, Y H:i') }}</p>
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <x-label for="is_active" value="Status" />
+                                <x-input id="is_active" type="text" name="is_active"
+                                    class="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                    :value="$letterType->is_active ? 'Active' : 'Inactive'" disabled readonly />
+                            </div>
+
+                            <div>
+                                <x-label for="created_at" value="Created At" />
+                                <x-input id="created_at" type="text" name="created_at"
+                                    class="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                    :value="$letterType->created_at?->format('d-m-Y H:i:s') ?? '-'" disabled readonly />
                             </div>
                         </div>
-                    </div>
 
-                    <div class="border-t pt-6 mt-6 flex justify-end gap-3">
-                        <a href="{{ route('letter-types.edit', $letterType) }}" class="inline-block">
-                            <x-button>Edit</x-button>
-                        </a>
-                        <form method="POST" action="{{ route('letter-types.destroy', $letterType) }}"
-                            onsubmit="return confirm('Are you sure? This action cannot be undone.')" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <x-danger-button type="submit">Delete</x-danger-button>
-                        </form>
-                    </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <x-label for="updated_at" value="Updated At" />
+                                <x-input id="updated_at" type="text" name="updated_at"
+                                    class="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                    :value="$letterType->updated_at?->format('d-m-Y H:i:s') ?? '-'" disabled readonly />
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end">
+                            <a href="{{ route('letter-types.edit', $letterType) }}" class="inline-block">
+                                <x-button>Edit</x-button>
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -168,29 +168,6 @@ class LetterTypeController extends Controller implements HasMiddleware
     }
 
     /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(LetterType $letterType)
-    {
-        try {
-            $name = $letterType->name;
-            $letterType->forceDelete();
-
-            return redirect()
-                ->route('letter-types.index')
-                ->with('success', "Letter type '{$name}' deleted successfully.");
-        } catch (\Throwable $e) {
-            Log::error('Error deleting letter type', [
-                'letter_type_id' => $letterType->id,
-                'error' => $e->getMessage(),
-                'user_id' => auth()->id(),
-            ]);
-
-            return back()->with('error', 'Failed to delete letter type.');
-        }
-    }
-
-    /**
      * Toggle the active status of the letter type.
      */
     public function toggle(LetterType $letterType)
