@@ -584,7 +584,7 @@
                                                 <td>{{ $movement->created_at->format('d-M-Y H:i') }}</td>
                                                 <td>{{ $movement->fromUser?->name ?? 'System' }}</td>
                                                 <td>{{ $movement->toUser?->name ?? 'Everyone' }}</td>
-                                                <td>{{ $movement->action }}</td>
+                                                <td>{{ Str::headline($movement->action) }}</td>
                                                 <td>
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase no-print
                                                         {{ $movement->status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
