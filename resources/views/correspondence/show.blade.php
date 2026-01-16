@@ -4,6 +4,8 @@
             :title="$correspondence->register_number"
             :backUrl="route('correspondence.index', ['type' => $correspondence->type])"
             :showSearch="false"
+            :editUrl="auth()->user()->can('edit correspondence') ? route('correspondence.edit', $correspondence) : null"
+            showPrint
         />
     </x-slot>
 
@@ -92,6 +94,12 @@
             .border-blue-100, .border-yellow-100, .border-green-100, .border-gray-100, .border-purple-100,
             .border-orange-100, .border-indigo-100, .border-teal-100, .border-red-100 {
                 border-color: black !important;
+            }
+
+            /* Remove all borders from sections in print */
+            .bg-white[class*="shadow"] {
+                border: none !important;
+                border-bottom: none !important;
             }
 
             /* Table print styles */
@@ -234,16 +242,15 @@
             /* ===== PRINT HEADER STYLES ===== */
             .print-header {
                 text-align: center;
-                margin-bottom: 20px;
-                padding: 20px 0;
-                border-bottom: 2px solid black;
+                margin-bottom: 0px;
+                padding: 5px 0;
                 page-break-after: avoid;
             }
 
             .print-header img {
-                max-width: 60px;
+                max-width: 100px;
                 height: auto;
-                margin-bottom: 10px;
+                margin-bottom: 5px;
             }
 
             .print-header-title {
@@ -261,20 +268,19 @@
             .print-header-meta {
                 font-size: 9pt;
                 color: #333;
-                margin-top: 8px;
+                margin-top: 3px;
             }
         }
 
         /* Screen styles for header */
         .print-header {
             text-align: center;
-            margin-bottom: 20px;
-            padding: 20px 0;
-            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 2px;
+            padding: 5px 0;
         }
 
         .print-header img {
-            max-width: 60px;
+            max-width: 100px;
             height: auto;
             margin-bottom: 10px;
             display: block;
@@ -304,7 +310,10 @@
 
         @media print {
             .print-header {
-                border-bottom: 2px solid black;
+                text-align: center;
+                margin-bottom: 5px;
+                padding: 5px 0;
+                page-break-after: avoid;
             }
 
             .print-header-title {
@@ -339,95 +348,34 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Print & Screen Header -->
+
+
+            <x-status-message class="mb-4" />
+
+            <!-- Correspondence Information Section -->
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-6">
+                            <!-- Print & Screen Header -->
+
             <div class="print-header">
                 <div style="text-align: center;">
-                    <img src="{{ asset('icons-images/logo.png') }}" alt="Logo" style="width:60px;height:auto;display:block;margin:0 auto 10px;">
+                    <img src="{{ asset('icons-images/logo.png') }}" alt="Logo" style="width:100px;height:auto;display:block;margin:0 auto 5px;">
                     <div>
                         <div class="print-header-title">The Bank of Azad Jammu & Kashmir</div>
                         <div class="print-header-subtitle">{{ $correspondence->toDivision?->name ?? $correspondence->fromDivision?->name ?? 'Division' }}</div>
-                        <div class="print-header-meta">
+                        <div class="print-header-meta hidden print:block">
                             Printed: {{ now()->format('d-M-Y H:i') }} | Register #: {{ $correspondence->register_number }} | Type: {{ $correspondence->type }}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <x-status-message class="mb-4" />
-
-            {{-- Unified Main Card --}}
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6">
-                {{-- Card Header with Badges & Actions --}}
-                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <h3 class="text-lg font-bold text-gray-900 mr-2">Correspondence Information</h3>
-                        
-                        @if($correspondence->status)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border
-                                {{ $correspondence->status->color === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-100' : '' }}
-                                {{ $correspondence->status->color === 'yellow' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : '' }}
-                                {{ $correspondence->status->color === 'green' ? 'bg-green-50 text-green-700 border-green-100' : '' }}
-                                {{ $correspondence->status->color === 'gray' ? 'bg-gray-50 text-gray-700 border-gray-100' : '' }}
-                                {{ $correspondence->status->color === 'purple' ? 'bg-purple-50 text-purple-700 border-purple-100' : '' }}
-                                {{ $correspondence->status->color === 'orange' ? 'bg-orange-50 text-orange-700 border-orange-100' : '' }}
-                                {{ $correspondence->status->color === 'indigo' ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : '' }}
-                                {{ $correspondence->status->color === 'teal' ? 'bg-teal-50 text-teal-700 border-teal-100' : '' }}">
-                                {{ $correspondence->status->name }}
-                            </span>
-                        @endif
-
-                        @if($correspondence->priority)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border
-                                {{ $correspondence->priority->color === 'red' ? 'bg-red-50 text-red-700 border-red-100' : '' }}
-                                {{ $correspondence->priority->color === 'orange' ? 'bg-orange-50 text-orange-700 border-orange-100' : '' }}
-                                {{ $correspondence->priority->color === 'yellow' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : '' }}
-                                {{ $correspondence->priority->color === 'green' ? 'bg-green-50 text-green-700 border-green-100' : '' }}">
-                                {{ $correspondence->priority->name }}
-                            </span>
-                        @endif
-
-                        @if($correspondence->isOverdue())
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white animate-pulse">
-                                OVERDUE
-                            </span>
-                        @endif
-
-                        @if($correspondence->confidentiality !== 'Normal')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-600 text-white">
-                                {{ strtoupper($correspondence->confidentiality) }}
-                            </span>
-                        @endif
-                    </div>
-
-                    <div class="flex items-center space-x-2">
-                        <button type="button" onclick="window.print()"
-                                class="no-print inline-flex items-center px-4 py-2 bg-gray-800 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-gray-900 transition">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                            </svg>
-                            Print
-                        </button>
-                        @can('edit correspondence')
-                        <a href="{{ route('correspondence.edit', $correspondence) }}"
-                           class="no-print inline-flex items-center px-4 py-2 bg-blue-800 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-900 transition">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit
-                        </a>
-                        @endcan
-                        {{-- Mark To button removed; available under Activity & Actions tabs --}}
-                    </div>
-                </div>
-
-                <div class="p-2">
-                    <table class="info-table">
-                        <tbody>
-                            {{-- Basic Details Section --}}
-                            <tr>
-                                <th colspan="6" class="section-header">Basic Details</th>
-                            </tr>
-                            <tr>
+                <table class="info-table">
+                    <tbody>
+                        {{-- Basic Details Section --}}
+                        <tr>
+                            <th colspan="6" class="section-header">Basic Details</th>
+                        </tr>
+                        <tr>
                                 <th style="width: 16.67%;">{{ $correspondence->isReceipt() ? 'Receipt No' : 'Dispatch No' }}</th>
                                 <td style="width: 16.67%;">{{ $correspondence->isReceipt() ? ($correspondence->receipt_no ?? 'N/A') : ($correspondence->dispatch_no ?? 'N/A') }}</td>
                                 <th style="width: 16.67%;">Register No</th>
@@ -551,12 +499,11 @@
                             @endif
                         </tbody>
                     </table>
-                </div>
             </div>
 
-            {{-- Unified Actions Panel with Tabs --}}
-            <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden" x-data="{ activeTab: 'timeline' }">
-                <div class="px-6 py-3 border-b border-gray-200 bg-gray-50 flex flex-wrap items-center justify-between gap-3">
+            <!-- Activity & Actions Section -->
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6" x-data="{ activeTab: 'timeline' }">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-200">
                     <h3 class="text-lg font-bold text-gray-900 print-section-title">Activity & Actions</h3>
                     
                     <div class="flex flex-wrap p-1 bg-gray-200 rounded-lg gap-1 no-print">
@@ -934,8 +881,6 @@
                     @endif
                 </div>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 

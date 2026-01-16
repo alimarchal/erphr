@@ -5,6 +5,8 @@
     'backRoute' => 'dashboard',
     'backUrl' => null,
     'showSearch' => true,
+    'editUrl' => null,
+    'showPrint' => false,
 ])
 
 @php
@@ -37,6 +39,26 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
                 <span class="hidden md:inline-block">{{ $createLabel }}</span>
+            </a>
+        @endif
+
+        @if($showPrint)
+            <button type="button" onclick="window.print()"
+                class="no-print inline-flex items-center px-4 py-2 bg-gray-800 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-gray-900 transition">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Print
+            </button>
+        @endif
+
+        @if($editUrl)
+            <a href="{{ $editUrl }}"
+                class="no-print inline-flex items-center px-4 py-2 bg-blue-800 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-900 transition">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit
             </a>
         @endif
 
