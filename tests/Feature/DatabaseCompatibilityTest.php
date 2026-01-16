@@ -33,9 +33,9 @@ test('can access main administrative routes on postgres', function () {
 
     $routes = [
         '/correspondence',
-        '/users',
-        '/roles',
-        '/permissions',
+        '/settings/users',
+        '/settings/roles',
+        '/settings/permissions',
     ];
 
     foreach ($routes as $route) {
@@ -50,6 +50,7 @@ test('can create and log correspondence on postgres', function () {
     // Verify activity logging works with mixed IDs (BigInt User, UUID Correspondence)
     $response = $this->post('/correspondence', [
         'type' => 'Receipt',
+        'receipt_no' => 'REC-COMPAT-001',
         'subject' => 'Postgres Compatibility Test',
         'letter_date' => now()->format('Y-m-d'),
         'received_date' => now()->format('Y-m-d'),

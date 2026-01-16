@@ -27,6 +27,8 @@ class CorrespondenceFactory extends Factory
     {
         return [
             'type' => fake()->randomElement(['Receipt', 'Dispatch']),
+            'receipt_no' => fake()->optional(0.5)->bothify('REC-####-???'),
+            'dispatch_no' => fake()->optional(0.5)->bothify('DIS-####-???'),
             'letter_type_id' => LetterType::factory(),
             'category_id' => CorrespondenceCategory::factory(),
             'sender_name' => fake()->optional()->company(),
