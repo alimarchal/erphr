@@ -87,11 +87,31 @@
                 /* standard professional margin */
             }
 
+            /* Hide banner (first div under body with Alpine x-data containing icons) */
+            body>div:first-child {
+                display: none !important;
+            }
+
+            /* Hide navigation, header, footer */
             nav,
+            nav[wire\:id],
             header,
             footer,
             .no-print {
                 display: none !important;
+            }
+
+            /* Hide SVGs in banner/nav/header */
+            body>div:first-child svg,
+            nav svg,
+            header svg {
+                display: none !important;
+            }
+
+            /* Reset min-h-screen */
+            .min-h-screen {
+                min-height: auto !important;
+                background: white !important;
             }
 
             .max-w-7xl,

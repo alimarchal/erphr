@@ -13,6 +13,41 @@
                 display: none !important;
             }
 
+            /* ===== HIDE BANNER, NAVIGATION, AND HEADER ===== */
+            /* Hide Jetstream banner (first div under body with x-data containing icons) */
+            body > div:first-child {
+                display: none !important;
+            }
+
+            /* Hide navigation menu */
+            nav,
+            nav[wire\:id],
+            [wire\:snapshot],
+            .min-h-screen > nav {
+                display: none !important;
+            }
+
+            /* Hide page header (with purple buttons) */
+            header,
+            .min-h-screen > header,
+            header.bg-white {
+                display: none !important;
+            }
+
+            /* Hide all SVGs in header/nav areas (icons) */
+            body > div:first-child svg,
+            nav svg,
+            header svg {
+                display: none !important;
+            }
+
+            /* Reset min-h-screen container */
+            .min-h-screen {
+                min-height: auto !important;
+                background: white !important;
+            }
+
+            /* ===== BODY AND GENERAL STYLES ===== */
             body {
                 background-color: white !important;
                 color: black !important;
@@ -45,7 +80,7 @@
 
             /* Remove all colors for laser printing */
             .bg-blue-50, .bg-yellow-50, .bg-green-50, .bg-gray-50, .bg-purple-50, .bg-orange-50, .bg-indigo-50, .bg-teal-50,
-            .bg-red-50, .bg-blue-100, .bg-gray-100, .bg-red-600, .bg-purple-600 {
+            .bg-red-50, .bg-blue-100, .bg-gray-100, .bg-red-600, .bg-purple-600, .bg-indigo-500, .bg-indigo-600 {
                 background-color: white !important;
             }
 
@@ -195,11 +230,129 @@
                 background-color: transparent !important;
                 color: black !important;
             }
+
+            /* ===== PRINT HEADER STYLES ===== */
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+                padding: 20px 0;
+                border-bottom: 2px solid black;
+                page-break-after: avoid;
+            }
+
+            .print-header img {
+                max-width: 60px;
+                height: auto;
+                margin-bottom: 10px;
+            }
+
+            .print-header-title {
+                font-size: 16pt;
+                font-weight: bold;
+                margin-bottom: 4px;
+            }
+
+            .print-header-subtitle {
+                font-size: 12pt;
+                font-weight: 600;
+                margin-bottom: 4px;
+            }
+
+            .print-header-meta {
+                font-size: 9pt;
+                color: #333;
+                margin-top: 8px;
+            }
+        }
+
+        /* Screen styles for header */
+        .print-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px 0;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .print-header img {
+            max-width: 60px;
+            height: auto;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .print-header-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #1f2937;
+        }
+
+        .print-header-subtitle {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #374151;
+        }
+
+        .print-header-meta {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        @media print {
+            .print-header {
+                border-bottom: 2px solid black;
+            }
+
+            .print-header-title {
+                font-size: 16pt;
+            }
+
+            .print-header-subtitle {
+                font-size: 12pt;
+            }
+
+            .print-header-meta {
+                font-size: 9pt;
+                color: #333;
+            }
+        }
+
+        /* Screen: Hide print-only elements */
+        .print-only {
+            display: block;
+        }
+
+        @media print {
+            .print-only {
+                display: block !important;
+            }
+
+            .print-header {
+                display: block !important;
+            }
         }
     </style>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Print & Screen Header -->
+            <div class="print-header">
+                <div style="text-align: center;">
+                    <img src="{{ asset('icons-images/logo.png') }}" alt="Logo" style="width:60px;height:auto;display:block;margin:0 auto 10px;">
+                    <div>
+                        <div class="print-header-title">The Bank of Azad Jammu & Kashmir</div>
+                        <div class="print-header-subtitle">{{ $correspondence->toDivision?->name ?? $correspondence->fromDivision?->name ?? 'Division' }}</div>
+                        <div class="print-header-meta">
+                            Printed: {{ now()->format('d-M-Y H:i') }} | Register #: {{ $correspondence->register_number }} | Type: {{ $correspondence->type }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <x-status-message class="mb-4" />
 
             {{-- Unified Main Card --}}
