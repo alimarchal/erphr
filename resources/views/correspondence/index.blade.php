@@ -232,9 +232,8 @@
     </x-filter-section>
 
     <x-data-table :items="$correspondences" :headers="[
-        ['label' => 'Record No.', 'align' => 'text-center'],
-        ['label' => 'Date'],
-        ['label' => 'Register No.'],
+        ['label' => 'Rec No.', 'align' => 'text-center'],
+        ['label' => 'Date / Reg # / Ref #'],
         ['label' => 'Subject / Address To'],
         ['label' => 'From/To'],
         ['label' => 'Confidentiality', 'align' => 'text-center'],
@@ -253,51 +252,51 @@
 
             {{-- Date --}}
             <td class="py-2 px-2 whitespace-nowrap">
-                {{ $item->type === 'Receipt' ? $item->received_date?->format('d-m-Y') : $item->dispatch_date?->format('d-m-Y') }}
+                {{ $item->type === 'Receipt' ? 'Rec: ' . $item->received_date?->format('d-m-Y') : 'Disp: ' . $item->dispatch_date?->format('d-m-Y') }}
                 @if($item->letter_date)
-                    <div class="text-xs text-gray-500">Letter: {{ $item->letter_date->format('d-m-Y') }}</div>
+                    <div class="text-xs text-gray-500">Letter Date: {{ $item->letter_date->format('d-m-Y') }}</div>
                 @endif
                 @if($item->letterType)
-                    <div class="text-xs font-semibold text-gray-600">{{ $item->letterType->name }}</div>
+                    <div class="text-xs font-semibold text-gray-600">
+                        <abbr title="Letter Type">{{ $item->letterType->name }}</abbr>
+                        /
+                    @if($item->category)
+                        <abbr title="Category">{{ $item->category->name }}</abbr>
+                    @endif
+                    </div>
                 @endif
-            </td>
 
-            {{-- Register No. --}}
-            <td class="py-2 px-2">
-                <a href="{{ route('correspondence.show', $item) }}" class="text-blue-600 hover:underline font-medium">
+                 <a href="{{ route('correspondence.show', $item) }}" class="text-blue-600 hover:underline font-medium">
                     {{ $item->register_number }}
                 </a>
                 @if($item->reference_number)
                     <div class="text-xs text-gray-500">Ref: {{ $item->reference_number }}</div>
                 @endif
-                 @if($item->category)
-                 
-                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-black rounded border border-gray-200">
-                            {{ $item->category->name }}
-                        </span>
-                @endif
+                
             </td>
+
+          
 
             {{-- Subject --}}
             <td class="py-2 px-2 max-w-xs">
-                <div title="{{ $item->subject }}">{{ Str::limit($item->subject, 50) }}</div>
+                <div title="{{ $item->subject }}" class="leading-tight break-words">
+                    {!! nl2br(e(wordwrap(Str::limit($item->subject, 90), 30, "\n", true))) !!}
+                </div>
+
                 @if($item->addressedTo)
-                    <div class="text-[10px] text-gray-400 italic" title="{{ $item->addressedTo->name }}">
+                    <div class="text-xs text-gray-500" title="{{ $item->addressedTo->name }}">
                         Adsd To: {{ Str::limit($item->addressedTo->name, 40) }}
                     </div>
                 @endif
                
                 <div class="flex flex-wrap gap-1 mt-1">
-                    {{-- @if($item->category)
-                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded border border-gray-200">
-                            {{ $item->category->name }}
-                        </span>
-                    @endif --}}
+
                     @if($item->initial_action)
-                        <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100">
+                        <span class="text-xs text-gray-500">
                             Marking: {{ $item->initial_action }}
                         </span>
                     @endif
+                    
                 </div> 
             </td>
 

@@ -90,7 +90,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
         $correspondences = $query
             ->orderByDesc('created_at')
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('correspondence.index', [
