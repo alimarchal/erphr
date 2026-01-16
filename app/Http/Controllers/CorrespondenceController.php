@@ -135,7 +135,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'divisions' => Division::orderBy('name')->get(),
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
-            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
+            'users' => User::orderBy('id')->get(['id', 'name', 'designation']),
         ]);
     }
 
@@ -157,7 +157,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'divisions' => Division::orderBy('name')->get(),
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
-            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
+            'users' => User::orderBy('id')->get(['id', 'name', 'designation']),
         ]);
     }
 
@@ -294,7 +294,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
         return view('correspondence.show', [
             'correspondence' => $correspondence,
-            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
+            'users' => User::orderBy('id')->get(['id', 'name', 'designation']),
             'statuses' => CorrespondenceStatus::active()
                 ->where(function ($q) use ($correspondence) {
                     $q->where('type', $correspondence->type)->orWhere('type', 'Both');
@@ -326,7 +326,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'divisions' => Division::orderBy('name')->get(),
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
-            'users' => User::orderBy('name')->get(['id', 'name', 'designation']),
+            'users' => User::orderBy('id')->get(['id', 'name', 'designation']),
         ]);
     }
 

@@ -313,21 +313,17 @@
                                 <th>Branch</th>
                                 <td>{{ $correspondence->branch?->name ?? 'N/A' }}</td>
                                 <th>Marked To</th>
-                                <td>
-                                    @if($correspondence->markedTo)
-                                        {{ $correspondence->markedTo->name }}{{ $correspondence->markedTo->designation ? " ({$correspondence->markedTo->designation})" : '' }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
+                                <td>{{ $correspondence->markedTo?->name ?? 'N/A' }}</td>
+                                <th>Marked To Designation</th>
+                                <td>{{ $correspondence->markedTo?->designation ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
                                 <th>Addressed To</th>
-                                <td>
-                                    @if($correspondence->addressedTo)
-                                        {{ $correspondence->addressedTo->name }}{{ $correspondence->addressedTo->designation ? " ({$correspondence->addressedTo->designation})" : '' }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
+                                <td>{{ $correspondence->addressedTo?->name ?? 'N/A' }}</td>
+                                <th>Addressed To Designation</th>
+                                <td>{{ $correspondence->addressedTo?->designation ?? 'N/A' }}</td>
+                                <th>To Division (Internal)</th>
+                                <td>{{ $correspondence->toDivision?->name ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <th>Current Holder</th>
