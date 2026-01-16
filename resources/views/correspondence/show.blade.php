@@ -351,67 +351,6 @@
                 </div>
             </div>
 
-            {{-- Quick Actions: Status & Comment --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 no-print">
-                {{-- Status Update Card --}}
-                <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden border border-blue-100 h-full">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Update Status
-                        </h3>
-                    </div>
-                    <div class="p-6">
-                        <form action="{{ route('correspondence.status.update', $correspondence) }}" method="POST">
-                            @csrf
-                            <div class="flex items-end gap-3">
-                                <div class="flex-grow">
-                                    <x-label for="quick_status_id" value="Select Status" class="text-xs font-semibold text-gray-500 mb-1" />
-                                    <select id="quick_status_id" name="status_id" required class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                        <option value="">Choose status...</option>
-                                        @foreach($statuses as $status)
-                                            <option value="{{ $status->id }}" {{ $correspondence->status_id == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-700 transition shadow-sm h-[38px]">
-                                    Update
-                                </button>
-                            </div>
-                            <div class="mt-3">
-                                <x-label for="status_remarks" value="Add optional note to timeline" class="text-[10px] font-semibold text-gray-400 mb-1 uppercase tracking-wider" />
-                                <input type="text" id="status_remarks" name="remarks" placeholder="Explain the reason for status change (optional)..." class="block w-full border-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                {{-- Quick Comment Card --}}
-                <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden border border-gray-100 h-full">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                            </svg>
-                            Add Quick Comment
-                        </h3>
-                    </div>
-                    <div class="p-6">
-                        <form action="{{ route('correspondence.comment.add', $correspondence) }}" method="POST" class="flex gap-4">
-                            @csrf
-                            <div class="flex-grow">
-                                <input type="text" name="comment" required placeholder="Type your comment here..." class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                            </div>
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-indigo-700 transition shadow-sm">
-                                Post
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
                 {{-- Movement Trail with Tabs --}}
                 <div class="lg:col-span-2" x-data="{ activeTab: 'timeline' }">
@@ -730,6 +669,67 @@
                             </div>
                         </div>
                     @endif
+                </div>
+            </div>
+
+            {{-- Quick Actions: Status & Comment --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 no-print">
+                {{-- Status Update Card --}}
+                <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden border border-blue-100 h-full">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Update Status
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <form action="{{ route('correspondence.status.update', $correspondence) }}" method="POST">
+                            @csrf
+                            <div class="flex items-end gap-3">
+                                <div class="flex-grow">
+                                    <x-label for="quick_status_id" value="Select Status" class="text-xs font-semibold text-gray-500 mb-1" />
+                                    <select id="quick_status_id" name="status_id" required class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                        <option value="">Choose status...</option>
+                                        @foreach($statuses as $status)
+                                            <option value="{{ $status->id }}" {{ $correspondence->status_id == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-700 transition shadow-sm h-[38px]">
+                                    Update
+                                </button>
+                            </div>
+                            <div class="mt-3">
+                                <x-label for="status_remarks" value="Add optional note to timeline" class="text-[10px] font-semibold text-gray-400 mb-1 uppercase tracking-wider" />
+                                <input type="text" id="status_remarks" name="remarks" placeholder="Explain the reason for status change (optional)..." class="block w-full border-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- Quick Comment Card --}}
+                <div class="bg-white shadow-xl sm:rounded-lg overflow-hidden border border-gray-100 h-full">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                            Add Quick Comment
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <form action="{{ route('correspondence.comment.add', $correspondence) }}" method="POST" class="flex gap-4">
+                            @csrf
+                            <div class="flex-grow">
+                                <input type="text" name="comment" required placeholder="Type your comment here..." class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                            </div>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-indigo-700 transition shadow-sm">
+                                Post
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
