@@ -31,5 +31,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return ($user->hasRole('super-admin') || $user->is_super_admin === 'Yes') ? true : null;
         });
+
+        // Define the manage correspondence categories gate
+        Gate::define('manage correspondence categories', function ($user) {
+            return $user->hasPermissionTo('manage correspondence categories');
+        });
     }
 }

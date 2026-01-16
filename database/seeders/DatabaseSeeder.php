@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call(DivisionSeeder::class);
         $this->call(CorrespondenceModuleSeeder::class);
         $this->call(RoleAndPermissionSeeder::class);
+        $this->call(CorrespondenceReportPermissionSeeder::class);
+        $this->call(CorrespondenceCategoryPermissionSeeder::class);
+        $this->call(CorrespondenceCategorySeeder::class);
         $this->call(UserSeeder::class);
     }
 }

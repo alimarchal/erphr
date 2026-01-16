@@ -20,6 +20,10 @@ Route::get('dashboard', Dashboard::class)
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('settings', function () {
+        return view('settings.index');
+    })->name('settings.index');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
@@ -39,6 +43,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Divisions CRUD
     Route::resource('settings/divisions', DivisionController::class)->names('divisions');
+
+    // Correspondence Categories CRUD
+    Route::resource('correspondence-categories', \App\Http\Controllers\CorrespondenceCategoryController::class);
+    Route::patch('correspondence-categories/{category}/toggle', [\App\Http\Controllers\CorrespondenceCategoryController::class, 'toggle'])->name('correspondence-categories.toggle');
 
     // User Management
     Route::resource('users', UserController::class);

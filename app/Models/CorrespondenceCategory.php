@@ -46,6 +46,16 @@ class CorrespondenceCategory extends Model
         return $this->hasMany(Correspondence::class, 'category_id');
     }
 
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
