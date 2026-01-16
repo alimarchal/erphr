@@ -42,7 +42,7 @@ Route::middleware(['auth'])->group(function () {
     // Settings Group
     Route::prefix('settings')->group(function () {
         // Divisions CRUD
-        Route::resource('divisions', DivisionController::class)->names('divisions');
+        Route::resource('divisions', DivisionController::class)->names('divisions')->except('destroy');
 
         // Correspondence Categories CRUD
         Route::resource('correspondence-categories', \App\Http\Controllers\CorrespondenceCategoryController::class);

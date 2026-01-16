@@ -123,20 +123,6 @@ test('division update requires name', function () {
     ])->assertSessionHasErrors(['name']);
 });
 
-test('authenticated users can delete a division', function () {
-    $this->actingAs($this->user);
-
-    $division = Division::factory()->create();
-
-    $this->delete(route('divisions.destroy', $division))
-        ->assertRedirect(route('divisions.index'))
-        ->assertSessionHas('success');
-
-    $this->assertSoftDeleted('divisions', [
-        'id' => $division->id,
-    ]);
-});
-
 test('divisions index can be filtered by name', function () {
     $this->actingAs($this->user);
 
