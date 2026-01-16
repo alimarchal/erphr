@@ -220,6 +220,33 @@
                 <x-input id="filter_received_to" name="filter[received_to]" type="date" class="mt-1 block w-full"
                     :value="request('filter.received_to')" />
             </div>
+
+            {{-- Sort (Select2) --}}
+            <div>
+                <x-label for="sort" value="Sort" />
+                <select id="sort" name="sort" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    @if(!$type || $type === 'Receipt')
+                        <option value="receipt_no" {{ request('sort') === 'receipt_no' ? 'selected' : '' }}>Receipt No (Ascending)</option>
+                        <option value="-receipt_no" {{ request('sort') === '-receipt_no' ? 'selected' : '' }}>Receipt No (Descending)</option>
+                    @endif
+                    @if(!$type || $type === 'Dispatch')
+                        <option value="dispatch_no" {{ request('sort') === 'dispatch_no' ? 'selected' : '' }}>Dispatch No (Ascending)</option>
+                        <option value="-dispatch_no" {{ request('sort') === '-dispatch_no' ? 'selected' : '' }}>Dispatch No (Descending)</option>
+                    @endif
+                    <option value="register_number" {{ request('sort') === 'register_number' ? 'selected' : '' }}>Register No (Ascending)</option>
+                    <option value="-register_number" {{ request('sort') === '-register_number' ? 'selected' : '' }}>Register No (Descending)</option>
+                    <option value="received_date" {{ request('sort') === 'received_date' ? 'selected' : '' }}>Received Date (Ascending)</option>
+                    <option value="-received_date" {{ request('sort') === '-received_date' ? 'selected' : '' }}>Received Date (Descending)</option>
+                    <option value="dispatch_date" {{ request('sort') === 'dispatch_date' ? 'selected' : '' }}>Dispatch Date (Ascending)</option>
+                    <option value="-dispatch_date" {{ request('sort') === '-dispatch_date' ? 'selected' : '' }}>Dispatch Date (Descending)</option>
+                    <option value="letter_date" {{ request('sort') === 'letter_date' ? 'selected' : '' }}>Letter Date (Ascending)</option>
+                    <option value="-letter_date" {{ request('sort') === '-letter_date' ? 'selected' : '' }}>Letter Date (Descending)</option>
+                    <option value="due_date" {{ request('sort') === 'due_date' ? 'selected' : '' }}>Due Date (Ascending)</option>
+                    <option value="-due_date" {{ request('sort') === '-due_date' ? 'selected' : '' }}>Due Date (Descending)</option>
+                    <option value="created_at" {{ request('sort') === 'created_at' ? 'selected' : '' }}>Created At (Ascending)</option>
+                    <option value="-created_at" {{ request('sort') === '-created_at' ? 'selected' : '' }}>Created At (Descending)</option>
+                </select>
+            </div>
         </div>
 
         <div class="mt-4 flex items-center gap-4">

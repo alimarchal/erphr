@@ -20,6 +20,7 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class CorrespondenceController extends Controller implements HasMiddleware
@@ -78,6 +79,27 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 AllowedFilter::callback('received_to', fn ($query, $value) => $value ? $query->whereDate('received_date', '<=', $value) : null),
                 AllowedFilter::callback('overdue', fn ($query, $value) => $value ? $query->overdue() : null),
             ])
+            ->allowedSorts([
+                AllowedSort::field('receipt_no'),
+                AllowedSort::field('dispatch_no'),
+                AllowedSort::field('register_number'),
+                AllowedSort::field('received_date'),
+                AllowedSort::field('dispatch_date'),
+                AllowedSort::field('letter_date'),
+                AllowedSort::field('due_date'),
+                AllowedSort::field('confidentiality'),
+                AllowedSort::field('priority_id'),
+                AllowedSort::field('status_id'),
+                AllowedSort::field('letter_type_id'),
+                AllowedSort::field('category_id'),
+                AllowedSort::field('current_holder_id'),
+                AllowedSort::field('marked_to_user_id'),
+                AllowedSort::field('addressed_to_user_id'),
+                AllowedSort::field('to_division_id'),
+                AllowedSort::field('region_id'),
+                AllowedSort::field('branch_id'),
+                AllowedSort::field('created_at'),
+            ])
             ->with(['letterType', 'category', 'status', 'priority', 'currentHolder', 'toDivision', 'fromDivision', 'region', 'branch', 'creator', 'addressedTo']);
 
         // Apply visibility scope
@@ -88,8 +110,18 @@ class CorrespondenceController extends Controller implements HasMiddleware
             $query->where('type', $type);
         }
 
+        // Apply default sorting when no explicit sort specified (latest first)
+        if (! $request->filled('sort')) {
+            if ($type === 'Receipt') {
+                $query->orderByDesc('receipt_no');
+            } elseif ($type === 'Dispatch') {
+                $query->orderByDesc('dispatch_no');
+            } else {
+                $query->orderByDesc('register_number');
+            }
+        }
+
         $correspondences = $query
-            ->orderByDesc('created_at')
             ->paginate(5)
             ->withQueryString();
 
