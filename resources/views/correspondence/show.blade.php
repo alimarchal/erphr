@@ -363,7 +363,7 @@
                         <div class="print-header-title">The Bank of Azad Jammu & Kashmir</div>
                         <div class="print-header-subtitle">{{ $correspondence->toDivision?->name ?? $correspondence->fromDivision?->name ?? 'Division' }}</div>
                         <div class="print-header-meta hidden print:block">
-                            Printed: {{ now()->format('d-M-Y H:i') }} | Register #: {{ $correspondence->register_number }} | Type: {{ $correspondence->type }}
+                            UUID: {{ $correspondence->id }} | Printed: {{ now()->format('d-M-Y H:i') }}
                         </div>
                     </div>
                 </div>
