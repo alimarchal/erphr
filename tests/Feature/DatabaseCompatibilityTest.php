@@ -83,7 +83,7 @@ test('can manage users and roles with transactions on postgres', function () {
     $p2 = Permission::firstOrCreate(['name' => 'edit users', 'guard_name' => 'web']);
 
     // Create a new role
-    $roleResponse = $this->post('/roles', [
+    $roleResponse = $this->post('/settings/roles', [
         'name' => 'test-postgres-role-'.uniqid(),
         'guard_name' => 'web',
         'permissions' => [$p1->id, $p2->id],
@@ -94,7 +94,7 @@ test('can manage users and roles with transactions on postgres', function () {
     expect($role)->not->toBeNull();
 
     // Create a new user with that role
-    $userResponse = $this->post('/users', [
+    $userResponse = $this->post('/settings/users', [
         'name' => 'Postgres User',
         'email' => 'pguser'.uniqid().'@example.com',
         'password' => 'password',
