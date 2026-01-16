@@ -46,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Correspondence Categories CRUD
         Route::resource('correspondence-categories', \App\Http\Controllers\CorrespondenceCategoryController::class);
-        Route::patch('correspondence-categories/{category}/toggle', [\App\Http\Controllers\CorrespondenceCategoryController::class, 'toggle'])->name('correspondence-categories.toggle');
+        Route::patch('correspondence-categories/{correspondenceCategory}/toggle', [\App\Http\Controllers\CorrespondenceCategoryController::class, 'toggle'])->name('correspondence-categories.toggle');
 
         // Letter Types CRUD
         Route::resource('letter-types', \App\Http\Controllers\LetterTypeController::class)->except('destroy');
@@ -98,7 +98,7 @@ Route::middleware(['auth'])->group(function () {
         // Marking and movement actions
         Route::post('/{correspondence}/mark', [CorrespondenceController::class, 'mark'])->name('mark');
         Route::post('/{correspondence}/movement', [CorrespondenceController::class, 'updateMovement'])->name('movement.update');
-        Route::post('/{correspondence}/status', [CorrespondenceController::class, 'updateStatus'])->name('status.update');
+        Route::put('/{correspondence}/status', [CorrespondenceController::class, 'updateStatus'])->name('updateStatus');
         Route::post('/{correspondence}/comment', [CorrespondenceController::class, 'addComment'])->name('comment.add');
     });
 });

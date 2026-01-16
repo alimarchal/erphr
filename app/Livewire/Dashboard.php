@@ -21,7 +21,9 @@ class Dashboard extends Component
 
     public function mount(): void
     {
-        $this->isAdmin = auth()->user()->hasRole(['super-admin', 'admin']);
+        if (auth()->check()) {
+            $this->isAdmin = auth()->user()->hasRole(['super-admin', 'admin']);
+        }
         $this->fromDate = $this->fromDate ?? now()->startOfMonth()->format('Y-m-d');
         $this->toDate = $this->toDate ?? now()->format('Y-m-d');
     }
@@ -35,6 +37,19 @@ class Dashboard extends Component
 
     public function getStatsProperty(): array
     {
+        if (! auth()->check()) {
+            return [
+                'total' => 0,
+                'receipts' => 0,
+                'dispatches' => 0,
+                'pending' => 0,
+                'closed' => 0,
+                'overdue' => 0,
+                'urgent' => 0,
+                'replied' => 0,
+            ];
+        }
+
         $user = auth()->user();
         $query = Correspondence::query()
             ->whereBetween('created_at', [$this->fromDate.' 00:00:00', $this->toDate.' 23:59:59']);
@@ -61,6 +76,10 @@ class Dashboard extends Component
 
     public function getChartDataProperty(): array
     {
+        if (! auth()->check()) {
+            return $this->getEmptyChartData();
+        }
+
         $user = auth()->user();
         $start = Carbon::parse($this->fromDate)->startOfDay();
         $end = Carbon::parse($this->toDate)->endOfDay();
@@ -187,6 +206,35 @@ class Dashboard extends Component
             'confidentiality' => [
                 'labels' => $confidentialityBreakdown->pluck('label')->toArray(),
                 'values' => $confidentialityBreakdown->pluck('value')->toArray(),
+            ],
+        ];
+    }
+
+    private function getEmptyChartData(): array
+    {
+        return [
+            'trend' => [
+                'dates' => [],
+                'receipts' => [],
+                'dispatches' => [],
+            ],
+            'status' => [
+                'labels' => [],
+                'values' => [],
+                'colors' => [],
+            ],
+            'workload' => [
+                'labels' => [],
+                'values' => [],
+            ],
+            'priority' => [
+                'labels' => [],
+                'values' => [],
+                'colors' => [],
+            ],
+            'confidentiality' => [
+                'labels' => [],
+                'values' => [],
             ],
         ];
     }

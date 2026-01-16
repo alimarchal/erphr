@@ -788,7 +788,7 @@
 
                     {{-- Update Status Tab --}}
                     <div x-show="activeTab === 'status'" style="display: none;" class="no-print">
-                        <form action="{{ route('correspondence.status.update', $correspondence) }}" method="POST">
+                        <form action="{{ route('correspondence.updateStatus', $correspondence) }}" method="POST">
                             @csrf
                             <div class="flex flex-wrap items-end gap-3">
                                 <div class="flex-grow min-w-[200px]">

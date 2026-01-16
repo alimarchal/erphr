@@ -22,7 +22,7 @@ class StoreCorrespondenceCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:correspondence_categories,name'],
             'code' => ['nullable', 'string', 'max:20', 'unique:correspondence_categories,code'],
             'parent_id' => ['nullable', 'exists:correspondence_categories,id'],
         ];
