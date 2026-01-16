@@ -582,8 +582,18 @@
                                             <tr>
                                                 <td class="text-center font-bold">{{ $movement->sequence }}</td>
                                                 <td>{{ $movement->created_at->format('d-M-Y H:i') }}</td>
-                                                <td>{{ $movement->fromUser?->name ?? 'System' }}</td>
-                                                <td>{{ $movement->toUser?->name ?? 'Everyone' }}</td>
+                                                <td>
+                                                    {{ $movement->fromUser?->name ?? 'System' }}
+                                                    @if($movement->from_designation)
+                                                        <br><span class="text-[10px] text-gray-600 print:text-[8pt]">({{ $movement->from_designation }})</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    {{ $movement->toUser?->name ?? 'Everyone' }}
+                                                    @if($movement->to_designation)
+                                                        <br><span class="text-[10px] text-gray-600 print:text-[8pt]">({{ $movement->to_designation }})</span>
+                                                    @endif
+                                                </td>
                                                 <td>{{ Str::headline($movement->action) }}</td>
                                                 <td>
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase no-print
