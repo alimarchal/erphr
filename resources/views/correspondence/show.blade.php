@@ -305,7 +305,7 @@
                                 <th>External Party (Sender/Recipient)</th>
                                 <td>{{ $correspondence->sender_name ?? 'N/A' }}</td>
                                 <th>From Division (Internal)</th>
-                                <td>{{ $correspondence->fromDivision?->name ?? 'N/A' }}</td>
+                                <td>{{ $correspondence->fromDivision?->short_name ?? $correspondence->fromDivision?->name ?? 'N/A' }}</td>
                                 <th>Region</th>
                                 <td>{{ $correspondence->region?->name ?? 'N/A' }}</td>
                             </tr>
@@ -323,7 +323,7 @@
                                 <th>Addressed To Designation</th>
                                 <td>{{ $correspondence->addressedTo?->designation ?? 'N/A' }}</td>
                                 <th>To Division (Internal)</th>
-                                <td>{{ $correspondence->toDivision?->name ?? 'N/A' }}</td>
+                                <td>{{ $correspondence->toDivision?->short_name ?? $correspondence->toDivision?->name ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <th>Current Holder</th>
