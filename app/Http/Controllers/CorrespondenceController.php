@@ -214,6 +214,36 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 }
             }
 
+            // If Receipt with Divisional Head sender designation, create auto-movement to DH HR
+            if ($data['type'] === 'Receipt' && $data['sender_designation'] === 'Divisional Head') {
+                // Find Divisional Head HR user by designation
+                $divisionHead = User::where('designation', 'Divisional Head HR')
+                    ->orWhere('designation', 'like', '%Divisional Head%HR%')
+                    ->first();
+
+                if ($divisionHead && $divisionHead->id !== auth()->id()) {
+                    $movementSequence = $correspondence->movements()->max('sequence') + 1;
+                    $dhMovement = $correspondence->movements()->create([
+                        'from_user_id' => auth()->id(),
+                        'to_user_id' => $divisionHead->id,
+                        'to_division_id' => $data['to_division_id'] ?? null,
+                        'action' => 'ForAction',
+                        'instructions' => 'Presented to Divisional Head HR For Action',
+                        'remarks' => 'KPO Entry: '.($data['remarks'] ?? 'Divisional Head correspondence'),
+                        'sequence' => $movementSequence,
+                    ]);
+
+                    // Update current holder
+                    $correspondence->update([
+                        'current_holder_id' => $divisionHead->id,
+                        'current_holder_since' => now(),
+                    ]);
+
+                    // Notify the DH
+                    $divisionHead->notify(new \App\Notifications\CorrespondenceMarked($correspondence, $dhMovement));
+                }
+            }
+
             // Handle file attachments
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
@@ -277,7 +307,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             ->get()
             ->each(function ($movement) {
                 $movement->markAsReceived();
-                
+
                 activity()
                     ->performedOn($movement->correspondence)
                     ->event('auto-received')
@@ -291,7 +321,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             ->get()
             ->each(function ($movement) {
                 $movement->markAsReviewed();
-                
+
                 activity()
                     ->performedOn($movement->correspondence)
                     ->event('auto-reviewed')

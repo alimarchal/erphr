@@ -131,14 +131,51 @@
             </select>
         </div>
 
-        @if(!$isReceipt)
+        @if($isReceipt)
             <div>
-                <x-label for="due_date" value="Expected Reply Date" />
-                <x-input id="due_date" type="date" name="due_date" class="mt-1 block w-full"
-                    :value="old('due_date', $correspondence?->due_date?->format('Y-m-d'))" />
+                <x-label for="sender_designation" value="Sender Designation" />
+                <select id="sender_designation" name="sender_designation" class="select2 mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="">None</option>
+                    <option value="Divisional Head" {{ old('sender_designation', $correspondence?->sender_designation) === 'Divisional Head' ? 'selected' : '' }}>Divisional Head</option>
+                    <option value="Senior Manager" {{ old('sender_designation', $correspondence?->sender_designation) === 'Senior Manager' ? 'selected' : '' }}>Senior Manager</option>
+                    <option value="General Manager" {{ old('sender_designation', $correspondence?->sender_designation) === 'General Manager' ? 'selected' : '' }}>General Manager</option>
+                    <option value="Manager" {{ old('sender_designation', $correspondence?->sender_designation) === 'Manager' ? 'selected' : '' }}>Manager</option>
+                    <option value="Officer" {{ old('sender_designation', $correspondence?->sender_designation) === 'Officer' ? 'selected' : '' }}>Officer</option>
+                    <option value="Another" {{ old('sender_designation', $correspondence?->sender_designation) === 'Another' ? 'selected' : '' }}>Another</option>
+                </select>
             </div>
         @endif
     </div>
+
+    @if($isReceipt)
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <div id="sender_designation_other_div" style="display: {{ old('sender_designation', $correspondence?->sender_designation) === 'Another' ? 'block' : 'none' }};">
+                <x-label for="sender_designation_other" value="Specify Designation" />
+                <x-input id="sender_designation_other" type="text" name="sender_designation_other" class="mt-1 block w-full"
+                    :value="old('sender_designation_other', $correspondence?->sender_designation_other)"
+                    placeholder="Enter custom designation" />
+            </div>
+        </div>
+    @endif
+
+    @if(!$isReceipt)
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <div>
+                <x-label for="sending_address" value="Address of Sending (Destination)" />
+                <x-input id="sending_address" type="text" name="sending_address" class="mt-1 block w-full"
+                    :value="old('sending_address', $correspondence?->sending_address)"
+                    placeholder="e.g., Ministry of Finance, Islamabad" />
+            </div>
+
+            <div>
+                <x-label for="signed_by" value="Signed By" />
+                <x-input id="signed_by" type="text" name="signed_by" class="mt-1 block w-full"
+                    :value="old('signed_by', $correspondence?->signed_by)"
+                    placeholder="Name of signatory" />
+            </div>
+        </div>
+    @endif
+
 </div>
 
 {{-- From/To Information (Most Important Section) --}}
@@ -349,7 +386,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const regionSelect = document.getElementById('region_id');
     const branchSelect = document.getElementById('branch_id');
+    const senderDesignationSelect = document.getElementById('sender_designation');
+    const senderDesignationOtherDiv = document.getElementById('sender_designation_other_div');
     
+    // Branch filtering logic
     if (regionSelect && branchSelect) {
         const allBranchOptions = Array.from(branchSelect.options);
 
@@ -384,6 +424,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (regionSelect.value) {
             filterBranches();
         }
+    }
+
+    // Sender designation "Another" toggle logic
+    if (senderDesignationSelect && senderDesignationOtherDiv) {
+        function toggleSenderDesignationOther() {
+            const selectedValue = senderDesignationSelect.value;
+            senderDesignationOtherDiv.style.display = selectedValue === 'Another' ? 'block' : 'none';
+        }
+
+        senderDesignationSelect.addEventListener('change', toggleSenderDesignationOther);
     }
 });
 </script>

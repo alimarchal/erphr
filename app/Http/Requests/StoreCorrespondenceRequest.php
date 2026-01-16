@@ -23,6 +23,7 @@ class StoreCorrespondenceRequest extends FormRequest
     public function rules(): array
     {
         $isReceipt = $this->input('type') === 'Receipt';
+        $isDispatch = $this->input('type') === 'Dispatch';
 
         return [
             'type' => ['required', Rule::in(['Receipt', 'Dispatch'])],
@@ -52,6 +53,12 @@ class StoreCorrespondenceRequest extends FormRequest
             'courier_name' => ['nullable', 'string', 'max:255'],
             'courier_tracking' => ['nullable', 'string', 'max:255'],
             'remarks' => ['nullable', 'string'],
+            // Dispatch-specific fields
+            'sending_address' => $isDispatch ? ['nullable', 'string', 'max:500'] : ['nullable'],
+            'signed_by' => $isDispatch ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            // Receipt-specific fields
+            'sender_designation' => $isReceipt ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            'sender_designation_other' => $isReceipt ? ['nullable', 'string', 'max:255', 'required_if:sender_designation,Another'] : ['nullable'],
             'attachments' => ['nullable', 'array'],
             'attachments.*' => ['file', 'max:15360'], // 15MB max per file
         ];
@@ -70,7 +77,7 @@ class StoreCorrespondenceRequest extends FormRequest
             'subject.max' => 'The subject cannot exceed 1000 characters.',
             'received_date.required_if' => 'The received date is required for receipts.',
             'dispatch_date.required_if' => 'The dispatch date is required for dispatches.',
-#            'due_date.after_or_equal' => 'The due date must be today or a future date.',
+            //            'due_date.after_or_equal' => 'The due date must be today or a future date.',
             'attachments.*.max' => 'Each attachment must not exceed 15MB.',
         ];
     }

@@ -426,17 +426,53 @@
                                 <th>To Division (Internal)</th>
                                 <td>{{ $correspondence->toDivision?->short_name ?? $correspondence->toDivision?->name ?? 'N/A' }}</td>
                             </tr>
+
+                            {{-- Receipt-specific fields --}}
+                            @if($correspondence->type === 'Receipt')
+                                <tr>
+                                    <th>Sender Designation</th>
+                                    <td>{{ $correspondence->sender_designation ?? 'N/A' }}</td>
+                                    @if($correspondence->sender_designation === 'Another')
+                                        <th>Custom Designation</th>
+                                        <td colspan="3">{{ $correspondence->sender_designation_other ?? 'N/A' }}</td>
+                                    @else
+                                        <th></th>
+                                        <td colspan="3"></td>
+                                    @endif
+                                </tr>
+                            @endif
+
+                            {{-- Dispatch-specific fields --}}
+                            @if($correspondence->type === 'Dispatch')
+                                <tr>
+                                    <th>Address of Sending (Destination)</th>
+                                    <td>{{ $correspondence->sending_address ?? 'N/A' }}</td>
+                                    <th>Signed By</th>
+                                    <td colspan="3">{{ $correspondence->signed_by ?? 'N/A' }}</td>
+                                </tr>
+                            @endif
+
                             <tr>
                                 <th>Current Holder</th>
                                 <td>{{ $correspondence->currentHolder?->name ?? 'Not assigned' }}</td>
                                 <th>Since</th>
                                 <td>{{ $correspondence->current_holder_since?->format('d-M-Y H:i') ?? 'N/A' }}</td>
-                                <th>Due Date</th>
-                                <td>{{ $correspondence->due_date?->format('d-M-Y') ?? 'N/A' }}</td>
+                                @if($correspondence->type === 'Receipt')
+                                    <th>Due Date</th>
+                                    <td>{{ $correspondence->due_date?->format('d-M-Y') ?? 'N/A' }}</td>
+                                @else
+                                    <th></th>
+                                    <td></td>
+                                @endif
                             </tr>
                             <tr>
-                                <th>Days Open</th>
-                                <td>{{ $correspondence->days_open ?? 0 }} days</td>
+                                @if($correspondence->type === 'Receipt')
+                                    <th>Days Open</th>
+                                    <td>{{ $correspondence->days_open ?? 0 }} days</td>
+                                @else
+                                    <th></th>
+                                    <td></td>
+                                @endif
                                 <th>Status</th>
                                 <td>{{ $correspondence->status?->name ?? 'N/A' }}</td>
                                 <th>Priority</th>

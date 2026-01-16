@@ -74,6 +74,10 @@ class Correspondence extends Model implements HasMedia
         'reply_reference',
         'remarks',
         'metadata',
+        'sending_address',
+        'signed_by',
+        'sender_designation',
+        'sender_designation_other',
     ];
 
     protected function casts(): array
@@ -90,6 +94,7 @@ class Correspondence extends Model implements HasMedia
             'year' => 'integer',
             'serial_number' => 'integer',
             'metadata' => 'array',
+            'sender_designation' => 'string',
         ];
     }
 

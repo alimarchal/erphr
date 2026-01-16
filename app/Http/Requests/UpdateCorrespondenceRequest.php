@@ -22,6 +22,9 @@ class UpdateCorrespondenceRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isReceipt = $this->input('type') === 'Receipt';
+        $isDispatch = $this->input('type') === 'Dispatch';
+
         return [
             'receipt_no' => ['nullable', 'string', 'max:255', 'required_if:type,Receipt'],
             'dispatch_no' => ['nullable', 'string', 'max:255', 'required_if:type,Dispatch'],
@@ -52,6 +55,12 @@ class UpdateCorrespondenceRequest extends FormRequest
             'is_replied' => ['boolean'],
             'reply_date' => ['nullable', 'date'],
             'reply_reference' => ['nullable', 'string', 'max:255'],
+            // Dispatch-specific fields
+            'sending_address' => $isDispatch ? ['nullable', 'string', 'max:500'] : ['nullable'],
+            'signed_by' => $isDispatch ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            // Receipt-specific fields
+            'sender_designation' => $isReceipt ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            'sender_designation_other' => $isReceipt ? ['nullable', 'string', 'max:255', 'required_if:sender_designation,Another'] : ['nullable'],
             'attachments' => ['nullable', 'array'],
             'attachments.*' => ['file', 'max:15360'], // 15MB max per file
         ];
