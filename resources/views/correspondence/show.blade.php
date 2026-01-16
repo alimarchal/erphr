@@ -9,11 +9,6 @@
 
     <style>
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 1cm;
-            }
-
             .no-print {
                 display: none !important;
             }
@@ -23,6 +18,8 @@
                 color: black !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             .max-w-7xl {
@@ -38,7 +35,7 @@
                 background: white !important;
             }
 
-            .py-6, .py-12, .p-6, .p-8, .px-4, .px-6, .px-8, .sm\:px-6, .lg\:px-8 {
+            .py-6, .py-12, .p-6, .p-8, .px-4, .px-6, .px-8, .sm\:px-6, .lg\:px-8, .p-2 {
                 padding: 0 !important;
             }
 
@@ -66,6 +63,8 @@
             .info-table {
                 width: 100% !important;
                 page-break-inside: auto;
+                table-layout: fixed;
+                font-size: 9pt !important;
             }
 
             .info-table tr {
@@ -75,12 +74,28 @@
 
             .info-table th, .info-table td {
                 border: 1px solid black !important;
-                padding: 4px 6px !important;
+                padding: 3px 4px !important;
+                font-size: 9pt !important;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .info-table th {
+                font-size: 8pt !important;
+            }
+
+            .section-header {
                 font-size: 10pt !important;
+                padding: 3px !important;
             }
 
             .animate-pulse {
                 animation: none !important;
+            }
+
+            /* Scale content to fit */
+            .info-table td[colspan="6"] {
+                font-size: 9pt !important;
             }
         }
 

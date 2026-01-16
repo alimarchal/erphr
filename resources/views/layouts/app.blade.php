@@ -83,7 +83,6 @@
     <style>
         @media print {
             @page {
-                size: A4 portrait;
                 margin: 1cm;
                 /* standard professional margin */
             }
