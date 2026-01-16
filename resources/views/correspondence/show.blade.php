@@ -101,6 +101,7 @@
         .info-table td {
             font-weight: normal;
             color: #000;
+            text-align: left;
         }
 
         .info-table th, .info-table td {
@@ -118,6 +119,10 @@
             letter-spacing: 0.05em;
             text-align: center !important;
             padding: 4px 6px !important;
+        }
+
+        .content-cell {
+            text-align: left !important;
         }
 
         @media print {
@@ -257,24 +262,23 @@
                             </tr>
                             <tr>
                                 <th>Current Holder</th>
-                                <td>
-                                    {{ $correspondence->currentHolder?->name ?? 'Not assigned' }}
-                                    @if($correspondence->current_holder_since)
-                                        <br><small class="text-gray-500">(Since {{ $correspondence->current_holder_since->format('d-M-Y H:i') }})</small>
-                                    @endif
-                                </td>
+                                <td>{{ $correspondence->currentHolder?->name ?? 'Not assigned' }}</td>
+                                <th>Since</th>
+                                <td>{{ $correspondence->current_holder_since?->format('d-M-Y H:i') ?? 'N/A' }}</td>
                                 <th>Due Date</th>
                                 <td>{{ $correspondence->due_date?->format('d-M-Y') ?? 'N/A' }}</td>
-                                <th>Days Open</th>
-                                <td>{{ $correspondence->days_open ?? 0 }} days</td>
                             </tr>
                             <tr>
+                                <th>Days Open</th>
+                                <td>{{ $correspondence->days_open ?? 0 }} days</td>
                                 <th>Status</th>
                                 <td>{{ $correspondence->status?->name ?? 'N/A' }}</td>
                                 <th>Priority</th>
                                 <td>{{ $correspondence->priority?->name ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
                                 <th>Confidentiality</th>
-                                <td>{{ $correspondence->confidentiality ?? 'Normal' }}</td>
+                                <td colspan="5">{{ $correspondence->confidentiality ?? 'Normal' }}</td>
                             </tr>
 
                             {{-- Delivery & Record Info Section --}}
@@ -291,46 +295,40 @@
                             </tr>
                             <tr>
                                 <th>Created By</th>
-                                <td>
-                                    {{ $correspondence->creator?->name ?? 'N/A' }}
-                                    @if($correspondence->created_at)
-                                        <br><small class="text-gray-500">{{ $correspondence->created_at->format('d-M-Y H:i') }}</small>
-                                    @endif
-                                </td>
+                                <td>{{ $correspondence->creator?->name ?? 'N/A' }}</td>
+                                <th>Created At</th>
+                                <td>{{ $correspondence->created_at?->format('d-M-Y H:i') ?? 'N/A' }}</td>
                                 <th>Last Updated By</th>
-                                <td colspan="3">
-                                    {{ $correspondence->updater?->name ?? 'N/A' }}
-                                    @if($correspondence->updated_at)
-                                        <span class="text-gray-500"> - {{ $correspondence->updated_at->format('d-M-Y H:i') }}</span>
-                                    @endif
-                                </td>
+                                <td>{{ $correspondence->updater?->name ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated At</th>
+                                <td colspan="5">{{ $correspondence->updated_at?->format('d-M-Y H:i') ?? 'N/A' }}</td>
                             </tr>
 
                             {{-- Subject Section --}}
                             <tr>
-                                <th colspan="6" class="section-header">Subject</th>
+                                <th colspan="6" class="section-header" style="text-align: left!important;">Subject</th>
                             </tr>
                             <tr>
-                                <td colspan="6" style="padding: 12px;"><strong>{{ $correspondence->subject ?? 'N/A' }}</strong></td>
+                                <td colspan="6" class="content-cell" style="padding: 12px;"><strong>{{ $correspondence->subject ?? 'N/A' }}</strong></td>
                             </tr>
 
                             {{-- Description Section --}}
-                            @if($correspondence->description)
                             <tr>
-                                <th colspan="6" class="section-header">Description</th>
+                                <th colspan="6" class="section-header" style="text-align: left!important;">Description</th>
                             </tr>
                             <tr>
-                                <td colspan="6" style="padding: 12px; line-height: 1.6;">{{ $correspondence->description }}</td>
+                                <td colspan="6" class="content-cell" style="padding: 12px; line-height: 1.6;">{{ $correspondence->description ?? 'N/A' }}</td>
                             </tr>
-                            @endif
 
                             {{-- Remarks Section --}}
                             @if($correspondence->remarks)
                             <tr>
-                                <th colspan="6" class="section-header">Remarks</th>
+                                <th colspan="6" class="section-header" style="text-align: left!important;">Remarks</th>
                             </tr>
                             <tr>
-                                <td colspan="6" style="padding: 12px; font-style: italic;">{{ $correspondence->remarks }}</td>
+                                <td colspan="6" class="content-cell" style="padding: 12px; font-style: italic;">{{ $correspondence->remarks }}</td>
                             </tr>
                             @endif
                         </tbody>
