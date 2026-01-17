@@ -435,7 +435,13 @@ document.addEventListener('DOMContentLoaded', function() {
             senderDesignationOtherDiv.style.display = selectedValue === 'Another' ? 'block' : 'none';
         }
 
+        // Listen for both regular change and Select2 change events
         senderDesignationSelect.addEventListener('change', toggleSenderDesignationOther);
+        
+        // Select2 specific event listener
+        if (typeof $ !== 'undefined') {
+            $(senderDesignationSelect).on('change.select2', toggleSenderDesignationOther);
+        }
     }
 });
 </script>

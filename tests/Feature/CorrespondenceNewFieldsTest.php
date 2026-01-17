@@ -199,7 +199,7 @@ describe('Receipt Correspondence', function () {
 });
 
 describe('Divisional Head Auto-Movement', function () {
-    it('creates auto-movement to DH HR when receipt sender_designation=Divisional Head', function () {
+    it('creates auto-movement to DH HR when addressed to Divisional Head HR', function () {
         $dhUser = User::factory()->create(['designation' => 'Divisional Head HR']);
 
         $response = $this->post(route('correspondence.store'), [
@@ -207,7 +207,7 @@ describe('Divisional Head Auto-Movement', function () {
             'receipt_no' => 'R-DH-001',
             'received_date' => now()->format('Y-m-d'),
             'subject' => 'DH Auto-Movement Test',
-            'sender_designation' => 'Divisional Head',
+            'addressed_to_user_id' => $dhUser->id,
         ]);
 
         $response->assertRedirect();
@@ -230,7 +230,7 @@ describe('Divisional Head Auto-Movement', function () {
             'receipt_no' => 'R-DH-002',
             'received_date' => now()->format('Y-m-d'),
             'subject' => 'DH Test with Remarks',
-            'sender_designation' => 'Divisional Head',
+            'addressed_to_user_id' => $dhUser->id,
             'remarks' => 'Urgent HR matter',
         ]);
 
@@ -243,20 +243,43 @@ describe('Divisional Head Auto-Movement', function () {
     });
 
     it('does not create auto-movement if no Divisional Head HR user exists', function () {
-        // No DH HR user created in this test
+        $divisionalHead = User::factory()->create(['designation' => 'Divisional Head HR']);
+        // Temporarily delete the user to test no DH HR scenario
+        $divisionalHead->delete();
+
+        $anotherUser = User::factory()->create(['designation' => 'Manager']);
 
         $response = $this->post(route('correspondence.store'), [
             'type' => 'Receipt',
             'receipt_no' => 'R-NO-DH',
             'received_date' => now()->format('Y-m-d'),
             'subject' => 'No DH HR User Test',
-            'sender_designation' => 'Divisional Head',
+            'addressed_to_user_id' => $anotherUser->id,
         ]);
 
         $response->assertRedirect();
         $correspondence = Correspondence::where('receipt_no', 'R-NO-DH')->first();
 
         // No movement should be created if DH HR doesn't exist
+        expect($correspondence->movements()->count())->toBe(0);
+    });
+
+    it('does not create auto-movement if addressed to non-divisional head HR', function () {
+        $dhUser = User::factory()->create(['designation' => 'Divisional Head HR']);
+        $regularUser = User::factory()->create(['designation' => 'Senior Manager']);
+
+        $response = $this->post(route('correspondence.store'), [
+            'type' => 'Receipt',
+            'receipt_no' => 'R-NO-AUTO',
+            'received_date' => now()->format('Y-m-d'),
+            'subject' => 'Regular User Test',
+            'addressed_to_user_id' => $regularUser->id,
+        ]);
+
+        $response->assertRedirect();
+        $correspondence = Correspondence::where('receipt_no', 'R-NO-AUTO')->first();
+
+        // No auto-movement should be created for non-Divisional Head HR
         expect($correspondence->movements()->count())->toBe(0);
     });
 });

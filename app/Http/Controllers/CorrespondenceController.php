@@ -215,33 +215,37 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 }
             }
 
-            // If Receipt with Divisional Head sender designation, create auto-movement to DH HR
-            if ($data['type'] === 'Receipt' && ($data['sender_designation'] ?? null) === 'Divisional Head') {
-                // Find Divisional Head HR user by designation
-                $divisionHead = User::where('designation', 'Divisional Head HR')
-                    ->orWhere('designation', 'like', '%Divisional Head%HR%')
-                    ->first();
+            // If Receipt addressed to a Divisional Head HR, create auto-movement to DH HR
+            if ($data['type'] === 'Receipt' && ! empty($data['addressed_to_user_id'])) {
+                $addressedToUser = User::find($data['addressed_to_user_id']);
 
-                if ($divisionHead && $divisionHead->id !== auth()->id()) {
-                    $movementSequence = $correspondence->movements()->max('sequence') + 1;
-                    $dhMovement = $correspondence->movements()->create([
-                        'from_user_id' => auth()->id(),
-                        'to_user_id' => $divisionHead->id,
-                        'to_division_id' => $data['to_division_id'] ?? null,
-                        'action' => 'ForAction',
-                        'instructions' => 'Presented to Divisional Head HR For Action',
-                        'remarks' => 'KPO Entry: '.($data['remarks'] ?? 'Divisional Head correspondence'),
-                        'sequence' => $movementSequence,
-                    ]);
+                if ($addressedToUser && $addressedToUser->designation === 'Divisional Head HR') {
+                    // Find Divisional Head HR user by designation (same user)
+                    $divisionHead = User::where('designation', 'Divisional Head HR')
+                        ->orWhere('designation', 'like', '%Divisional Head%HR%')
+                        ->first();
 
-                    // Update current holder
-                    $correspondence->update([
-                        'current_holder_id' => $divisionHead->id,
-                        'current_holder_since' => now(),
-                    ]);
+                    if ($divisionHead && $divisionHead->id !== auth()->id()) {
+                        $movementSequence = $correspondence->movements()->max('sequence') + 1;
+                        $dhMovement = $correspondence->movements()->create([
+                            'from_user_id' => auth()->id(),
+                            'to_user_id' => $data['marked_to_user_id'],
+                            'to_division_id' => $data['to_division_id'] ?? null,
+                            'action' => 'ForAction',
+                            'instructions' => 'Presented to Divisional Head HR For Action',
+                            'remarks' => 'KPO Entry: '.($data['remarks'] ?? 'Correspondence addressed to Divisional Head HR'),
+                            'sequence' => $movementSequence,
+                        ]);
 
-                    // Notify the DH
-                    $divisionHead->notify(new \App\Notifications\CorrespondenceMarked($correspondence, $dhMovement));
+                        // Update current holder
+                        $correspondence->update([
+                            'current_holder_id' => $divisionHead->id,
+                            'current_holder_since' => now(),
+                        ]);
+
+                        // Notify the DH
+                        $divisionHead->notify(new \App\Notifications\CorrespondenceMarked($correspondence, $dhMovement));
+                    }
                 }
             }
 
