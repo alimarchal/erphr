@@ -230,7 +230,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
                         $movementSequence = $correspondence->movements()->max('sequence') + 1;
                         $dhMovement = $correspondence->movements()->create([
                             'from_user_id' => auth()->id(),
-                            'to_user_id' => $data['marked_to_user_id'],
+                            'to_user_id' => $divisionHead->id,
                             'to_division_id' => $data['to_division_id'] ?? null,
                             'action' => 'ForAction',
                             'instructions' => 'Presented to Divisional Head HR For Action',

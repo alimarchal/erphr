@@ -210,8 +210,11 @@ describe('Divisional Head Auto-Movement', function () {
             'addressed_to_user_id' => $dhUser->id,
         ]);
 
+        $response->assertSessionHasNoErrors();
         $response->assertRedirect();
+
         $correspondence = Correspondence::where('receipt_no', 'R-DH-001')->first();
+        expect($correspondence)->not->toBeNull();
 
         // Check that auto-movement was created
         expect($correspondence->movements()->count())->toBe(1);
@@ -234,8 +237,11 @@ describe('Divisional Head Auto-Movement', function () {
             'remarks' => 'Urgent HR matter',
         ]);
 
+        $response->assertSessionHasNoErrors();
         $response->assertRedirect();
+
         $correspondence = Correspondence::where('receipt_no', 'R-DH-002')->first();
+        expect($correspondence)->not->toBeNull();
 
         $movement = $correspondence->movements()->first();
         expect($movement->remarks)->toContain('KPO Entry');
