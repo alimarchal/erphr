@@ -843,6 +843,7 @@
                                   }
                               }">
                             @csrf
+                            @method('PUT')
                             <div class="space-y-3">
                                 <div class="flex flex-wrap items-end gap-3">
                                     <div class="flex-grow min-w-[200px]">
