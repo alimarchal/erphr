@@ -111,13 +111,14 @@ class CorrespondenceController extends Controller implements HasMiddleware
         }
 
         // Apply default sorting when no explicit sort specified (latest first)
+        // Cast dispatch_no/receipt_no to integer for proper numeric ordering (e.g., 101 > 99)
         if (! $request->filled('sort')) {
             if ($type === 'Receipt') {
-                $query->orderByDesc('receipt_no');
+                $query->orderByRaw('CAST(receipt_no AS INTEGER) DESC');
             } elseif ($type === 'Dispatch') {
-                $query->orderByDesc('dispatch_no');
+                $query->orderByRaw('CAST(dispatch_no AS INTEGER) DESC');
             } else {
-                $query->orderByDesc('register_number');
+                $query->orderByDesc('serial_number');
             }
         }
 
