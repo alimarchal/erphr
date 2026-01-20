@@ -830,6 +830,16 @@
                                       const currentYear = new Date().getFullYear();
                                       const template = `Vide: ________ BAJK/HO/HRMD/${currentYear}/_________\nFiled In PP/CP ____________\nFiled In __________________`;
                                       document.getElementById('status_remarks').value = template;
+                                  },
+                                  checkAndFill(event) {
+                                      const select = event.target;
+                                      const selectedOption = select.options[select.selectedIndex];
+                                      const statusName = selectedOption.text.toLowerCase();
+                                      
+                                      // Only fill template if status is 'Closed'
+                                      if (statusName.includes('closed') || statusName.includes('close')) {
+                                          this.fillTemplate();
+                                      }
                                   }
                               }">
                             @csrf
@@ -838,7 +848,7 @@
                                     <div class="flex-grow min-w-[200px]">
                                         <x-label for="quick_status_id" value="Select Status" class="text-xs font-semibold text-gray-500 mb-1" />
                                         <select id="quick_status_id" name="status_id" required 
-                                                @change="fillTemplate()"
+                                                @change="checkAndFill($event)"
                                                 class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                             <option value="">Choose status...</option>
                                             @foreach($statuses as $status)
@@ -854,13 +864,13 @@
                                     <div class="flex items-center justify-between mb-1">
                                         <x-label for="status_remarks" value="Note (optional)" class="text-xs font-semibold text-gray-500" />
                                         <button type="button" @click="fillTemplate()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
-                                            Reset Template
+                                            Insert Template
                                         </button>
                                     </div>
                                     <textarea id="status_remarks" name="remarks" rows="3" 
-                                              placeholder="Auto-fills when status is selected..." 
+                                              placeholder="Template auto-fills when 'Closed' status is selected..." 
                                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"></textarea>
-                                    <p class="text-xs text-gray-500 mt-1">Template auto-fills with filing format. Click "Reset Template" to restore.</p>
+                                    <p class="text-xs text-gray-500 mt-1">Template auto-fills for Closed status. Click "Insert Template" to manually add.</p>
                                 </div>
                             </div>
                         </form>
