@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Correspondence;
-use App\Models\Division;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
@@ -18,6 +17,51 @@ class Dashboard extends Component
     public $toDate;
 
     public $isAdmin = false;
+
+    /**
+     * Map Tailwind color names to vibrant hex codes for charts.
+     */
+    private const TAILWIND_COLORS = [
+        'red' => '#ef4444',
+        'orange' => '#f97316',
+        'amber' => '#f59e0b',
+        'yellow' => '#eab308',
+        'lime' => '#84cc16',
+        'green' => '#22c55e',
+        'emerald' => '#10b981',
+        'teal' => '#14b8a6',
+        'cyan' => '#06b6d4',
+        'sky' => '#0ea5e9',
+        'blue' => '#3b82f6',
+        'indigo' => '#6366f1',
+        'violet' => '#8b5cf6',
+        'purple' => '#a855f7',
+        'fuchsia' => '#d946ef',
+        'pink' => '#ec4899',
+        'rose' => '#f43f5e',
+        'slate' => '#64748b',
+        'gray' => '#6b7280',
+        'zinc' => '#71717a',
+        'neutral' => '#737373',
+        'stone' => '#78716c',
+    ];
+
+    /**
+     * Convert a Tailwind color name to hex code.
+     */
+    private function toHexColor(?string $color): string
+    {
+        if ($color === null) {
+            return '#6b7280'; // gray-500 default
+        }
+
+        // If it's already a hex color, return it
+        if (str_starts_with($color, '#')) {
+            return $color;
+        }
+
+        return self::TAILWIND_COLORS[strtolower($color)] ?? '#6b7280';
+    }
 
     public function mount(): void
     {
@@ -128,7 +172,7 @@ class Dashboard extends Component
             ->map(fn ($item) => [
                 'label' => $item->status->name ?? 'Unknown',
                 'value' => $item->total,
-                'color' => $item->status->color ?? '#cbd5e1',
+                'color' => $this->toHexColor($item->status->color ?? null),
             ]);
 
         // 3. Division/Workload Breakdown (Admin Only)
@@ -160,14 +204,7 @@ class Dashboard extends Component
             ->map(fn ($item) => [
                 'label' => $item->priority->name ?? 'Normal',
                 'value' => $item->total,
-                'color' => match ($item->priority->name ?? 'Normal') {
-                    'Critical' => '#ef4444',
-                    'Urgent' => '#f97316',
-                    'High' => '#f59e0b',
-                    'Normal' => '#3b82f6',
-                    'Low' => '#10b981',
-                    default => '#cbd5e1',
-                },
+                'color' => $this->toHexColor($item->priority->color ?? null),
             ]);
 
         // 5. Confidentiality Breakdown
