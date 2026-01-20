@@ -22,7 +22,7 @@ Route::get('dashboard', Dashboard::class)
 Route::middleware(['auth'])->group(function () {
     Route::get('settings', function () {
         return view('settings.index');
-    })->name('settings.index');
+    })->middleware('can:view settings')->name('settings.index');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 
     // Settings Group
-    Route::prefix('settings')->group(function () {
+    Route::prefix('settings')->middleware('can:view settings')->group(function () {
         // Divisions CRUD
         Route::resource('divisions', DivisionController::class)->names('divisions')->except('destroy');
 

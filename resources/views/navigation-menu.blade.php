@@ -28,9 +28,11 @@
                         </x-nav-link>
                     @endcan
 
-                    <x-nav-link href="{{ route('settings.index') }}" :active="request()->routeIs('settings.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('correspondence-categories.*') || request()->routeIs('divisions.*')">
-                        {{ __('Settings') }}
-                    </x-nav-link>
+                    @can('view settings')
+                        <x-nav-link href="{{ route('settings.index') }}" :active="request()->routeIs('settings.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('correspondence-categories.*') || request()->routeIs('divisions.*')">
+                            {{ __('Settings') }}
+                        </x-nav-link>
+                    @endcan
 
                     @role('super-admin')
                     <x-nav-link href="{{ route('admin.activity-logs') }}"
@@ -192,9 +194,11 @@
                 </x-responsive-nav-link>
             @endcan
 
-            <x-responsive-nav-link href="{{ route('settings.index') }}" :active="request()->routeIs('settings.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('correspondence-categories.*') || request()->routeIs('divisions.*')">
-                {{ __('Settings') }}
-            </x-responsive-nav-link>
+            @can('view settings')
+                <x-responsive-nav-link href="{{ route('settings.index') }}" :active="request()->routeIs('settings.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('correspondence-categories.*') || request()->routeIs('divisions.*')">
+                    {{ __('Settings') }}
+                </x-responsive-nav-link>
+            @endcan
 
             @role('super-admin')
             <x-responsive-nav-link href="{{ route('admin.activity-logs') }}"

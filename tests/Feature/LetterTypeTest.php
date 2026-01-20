@@ -11,11 +11,14 @@ function setupUserForLetterTypes()
     app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
     Permission::firstOrCreate(
+        ['name' => 'view settings', 'guard_name' => 'web']
+    );
+    Permission::firstOrCreate(
         ['name' => 'manage letter types', 'guard_name' => 'web']
     );
 
     $user = User::factory()->create(['is_active' => 'Yes']);
-    $user->givePermissionTo('manage letter types');
+    $user->givePermissionTo(['view settings', 'manage letter types']);
 
     return $user;
 }

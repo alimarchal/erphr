@@ -11,11 +11,14 @@ function setupUser()
     app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
     Permission::firstOrCreate(
+        ['name' => 'view settings', 'guard_name' => 'web']
+    );
+    Permission::firstOrCreate(
         ['name' => 'manage correspondence categories', 'guard_name' => 'web']
     );
 
     $user = User::factory()->create();
-    $user->givePermissionTo('manage correspondence categories');
+    $user->givePermissionTo(['view settings', 'manage correspondence categories']);
 
     return $user;
 }
