@@ -111,12 +111,32 @@ class CorrespondenceController extends Controller implements HasMiddleware
         }
 
         // Apply default sorting when no explicit sort specified (latest first)
-        // Cast dispatch_no/receipt_no to integer for proper numeric ordering (e.g., 101 > 99)
+        // Only cast to integer if all values are numeric, otherwise fallback to serial_number
         if (! $request->filled('sort')) {
+            $driver = DB::connection()->getDriverName();
+            
             if ($type === 'Receipt') {
-                $query->orderByRaw('CAST(receipt_no AS INTEGER) DESC');
+                if ($driver === 'pgsql') {
+                    // PostgreSQL: check if numeric before casting
+                    $query->orderByRaw("CASE WHEN receipt_no ~ '^[0-9]+$' THEN CAST(receipt_no AS INTEGER) ELSE serial_number END DESC");
+                } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                    // MySQL/MariaDB: check if numeric before casting
+                    $query->orderByRaw("IF(receipt_no REGEXP '^[0-9]+$', CAST(receipt_no AS SIGNED), serial_number) DESC");
+                } else {
+                    // SQLite: CAST returns NULL if not convertible, use COALESCE fallback
+                    $query->orderByRaw("COALESCE(CAST(receipt_no AS INTEGER), serial_number) DESC");
+                }
             } elseif ($type === 'Dispatch') {
-                $query->orderByRaw('CAST(dispatch_no AS INTEGER) DESC');
+                if ($driver === 'pgsql') {
+                    // PostgreSQL: check if numeric before casting
+                    $query->orderByRaw("CASE WHEN dispatch_no ~ '^[0-9]+$' THEN CAST(dispatch_no AS INTEGER) ELSE serial_number END DESC");
+                } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                    // MySQL/MariaDB: check if numeric before casting
+                    $query->orderByRaw("IF(dispatch_no REGEXP '^[0-9]+$', CAST(dispatch_no AS SIGNED), serial_number) DESC");
+                } else {
+                    // SQLite: CAST returns NULL if not convertible, use COALESCE fallback
+                    $query->orderByRaw("COALESCE(CAST(dispatch_no AS INTEGER), serial_number) DESC");
+                }
             } else {
                 $query->orderByDesc('serial_number');
             }

@@ -824,25 +824,44 @@
 
                     {{-- Update Status Tab --}}
                     <div x-show="activeTab === 'status'" style="display: none;" class="no-print">
-                        <form action="{{ route('correspondence.updateStatus', $correspondence) }}" method="POST">
+                        <form action="{{ route('correspondence.updateStatus', $correspondence) }}" method="POST" 
+                              x-data="{
+                                  fillTemplate() {
+                                      const currentYear = new Date().getFullYear();
+                                      const template = `Vide: ________ BAJK/HO/HRMD/${currentYear}/_________\nFiled In PP/CP ____________\nFiled In __________________`;
+                                      document.getElementById('status_remarks').value = template;
+                                  }
+                              }">
                             @csrf
-                            <div class="flex flex-wrap items-end gap-3">
-                                <div class="flex-grow min-w-[200px]">
-                                    <x-label for="quick_status_id" value="Select Status" class="text-xs font-semibold text-gray-500 mb-1" />
-                                    <select id="quick_status_id" name="status_id" required class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                        <option value="">Choose status...</option>
-                                        @foreach($statuses as $status)
-                                            <option value="{{ $status->id }}" {{ $correspondence->status_id == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="space-y-3">
+                                <div class="flex flex-wrap items-end gap-3">
+                                    <div class="flex-grow min-w-[200px]">
+                                        <x-label for="quick_status_id" value="Select Status" class="text-xs font-semibold text-gray-500 mb-1" />
+                                        <select id="quick_status_id" name="status_id" required 
+                                                @change="fillTemplate()"
+                                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                            <option value="">Choose status...</option>
+                                            @foreach($statuses as $status)
+                                                <option value="{{ $status->id }}" {{ $correspondence->status_id == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-700 transition shadow-sm h-[38px]">
+                                        Update Status
+                                    </button>
                                 </div>
-                                <div class="flex-grow min-w-[200px]">
-                                    <x-label for="status_remarks" value="Note (optional)" class="text-xs font-semibold text-gray-500 mb-1" />
-                                    <input type="text" id="status_remarks" name="remarks" placeholder="Reason for status change..." class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <x-label for="status_remarks" value="Note (optional)" class="text-xs font-semibold text-gray-500" />
+                                        <button type="button" @click="fillTemplate()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                            Reset Template
+                                        </button>
+                                    </div>
+                                    <textarea id="status_remarks" name="remarks" rows="3" 
+                                              placeholder="Auto-fills when status is selected..." 
+                                              class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"></textarea>
+                                    <p class="text-xs text-gray-500 mt-1">Template auto-fills with filing format. Click "Reset Template" to restore.</p>
                                 </div>
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest rounded-md hover:bg-blue-700 transition shadow-sm h-[38px]">
-                                    Update Status
-                                </button>
                             </div>
                         </form>
                     </div>
