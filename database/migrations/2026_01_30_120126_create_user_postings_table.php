@@ -42,7 +42,7 @@ return new class extends Migration {
                     'short_name' => 'HRMD',
                     'created_at' => now(),
                     'updated_at' => now(),
-                    'created_by' => \Illuminate\Support\Facades\DB::table('users')->value('id') ?? 1, // Fallback to avoid error if empty
+                    'created_by' => \Illuminate\Support\Facades\DB::table('users')->value('id'), // Nullable if no user exists
                 ]);
                 $hrmd = \Illuminate\Support\Facades\DB::table('divisions')->where('short_name', 'HRMD')->first();
             } else {

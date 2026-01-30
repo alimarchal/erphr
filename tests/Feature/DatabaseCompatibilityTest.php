@@ -7,10 +7,14 @@ use App\Models\CorrespondenceStatus;
 use App\Models\LetterType;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Division;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
+    // Ensure a division exists
+    $this->division = Division::factory()->create();
+
     // Create a super admin for testing
     $this->user = User::factory()->create([
         'is_super_admin' => 'Yes',
@@ -84,7 +88,7 @@ test('can manage users and roles with transactions on postgres', function () {
 
     // Create a new role
     $roleResponse = $this->post('/settings/roles', [
-        'name' => 'test-postgres-role-'.uniqid(),
+        'name' => 'test-postgres-role-' . uniqid(),
         'guard_name' => 'web',
         'permissions' => [$p1->id, $p2->id],
     ]);
@@ -96,12 +100,14 @@ test('can manage users and roles with transactions on postgres', function () {
     // Create a new user with that role
     $userResponse = $this->post('/settings/users', [
         'name' => 'Postgres User',
-        'email' => 'pguser'.uniqid().'@example.com',
+        'email' => 'pguser' . uniqid() . '@example.com',
         'password' => 'password',
         'designation' => 'Tester',
         'is_super_admin' => 'No',
         'is_active' => 'Yes',
+        'is_active' => 'Yes',
         'roles' => [$role->id],
+        'division_id' => $this->division->id,
     ]);
 
     $userResponse->assertRedirect();
