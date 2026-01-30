@@ -21,4 +21,8 @@ class Division extends Model
         'name',
         'short_name',
     ];
+    public function postings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserPosting::class);
+    }
 }

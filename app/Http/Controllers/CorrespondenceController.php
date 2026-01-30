@@ -54,7 +54,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 'sort' => $request->get('sort'),
                 'page' => $request->get('page', 1),
             ])
-            ->log('Viewed correspondence list'.($type ? " ({$type})" : ''));
+            ->log('Viewed correspondence list' . ($type ? " ({$type})" : ''));
 
         $query = QueryBuilder::for(Correspondence::query())
             ->allowedFilters([
@@ -75,9 +75,9 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 AllowedFilter::exact('confidentiality'),
                 AllowedFilter::exact('year'),
                 AllowedFilter::exact('type'),
-                AllowedFilter::callback('received_from', fn ($query, $value) => $value ? $query->whereDate('received_date', '>=', $value) : null),
-                AllowedFilter::callback('received_to', fn ($query, $value) => $value ? $query->whereDate('received_date', '<=', $value) : null),
-                AllowedFilter::callback('overdue', fn ($query, $value) => $value ? $query->overdue() : null),
+                AllowedFilter::callback('received_from', fn($query, $value) => $value ? $query->whereDate('received_date', '>=', $value) : null),
+                AllowedFilter::callback('received_to', fn($query, $value) => $value ? $query->whereDate('received_date', '<=', $value) : null),
+                AllowedFilter::callback('overdue', fn($query, $value) => $value ? $query->overdue() : null),
             ])
             ->allowedSorts([
                 AllowedSort::field('receipt_no'),
@@ -112,9 +112,9 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
         // Apply default sorting when no explicit sort specified (latest first)
         // Only cast to integer if all values are numeric, otherwise fallback to serial_number
-        if (! $request->filled('sort')) {
+        if (!$request->filled('sort')) {
             $driver = DB::connection()->getDriverName();
-            
+
             if ($type === 'Receipt') {
                 if ($driver === 'pgsql') {
                     // PostgreSQL: check if numeric before casting
@@ -179,6 +179,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
             'users' => User::orderBy('id')->get(['id', 'name', 'designation']),
+            'currentDivisionShortName' => auth()->user()->currentDivisionShortName ?? 'HRMD',
         ]);
     }
 
@@ -210,7 +211,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             }
 
             // Set current holder to marked user if provided
-            if (! empty($data['marked_to_user_id'])) {
+            if (!empty($data['marked_to_user_id'])) {
                 $data['current_holder_id'] = $data['marked_to_user_id'];
                 $data['current_holder_since'] = now();
             }
@@ -219,7 +220,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
             // Create initial movement if marked to someone
             // If Receipt with marked_to_user_id, create initial movement
-            if (! empty($data['marked_to_user_id'])) {
+            if (!empty($data['marked_to_user_id'])) {
                 $movement = $correspondence->movements()->create([
                     'from_user_id' => auth()->id(),
                     'to_user_id' => $data['marked_to_user_id'],
@@ -237,7 +238,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             }
 
             // If Receipt addressed to a Divisional Head HR, create auto-movement to DH HR
-            if ($data['type'] === 'Receipt' && ! empty($data['addressed_to_user_id'])) {
+            if ($data['type'] === 'Receipt' && !empty($data['addressed_to_user_id'])) {
                 $addressedToUser = User::find($data['addressed_to_user_id']);
 
                 if ($addressedToUser && $addressedToUser->designation === 'Divisional Head HR') {
@@ -254,7 +255,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
                             'to_division_id' => $data['to_division_id'] ?? null,
                             'action' => 'ForAction',
                             'instructions' => 'Presented to Divisional Head HR For Action',
-                            'remarks' => 'KPO Entry: '.($data['remarks'] ?? 'Correspondence addressed to Divisional Head HR'),
+                            'remarks' => 'KPO Entry: ' . ($data['remarks'] ?? 'Correspondence addressed to Divisional Head HR'),
                             'sequence' => $movementSequence,
                         ]);
 
@@ -411,6 +412,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
             'regions' => Region::orderBy('name')->get(),
             'branches' => Branch::with('region')->orderBy('name')->get(),
             'users' => User::orderBy('id')->get(['id', 'name', 'designation']),
+            'currentDivisionShortName' => auth()->user()->currentDivisionShortName ?? 'HRMD',
         ]);
     }
 
@@ -655,7 +657,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
                 'from_user_id' => auth()->id(),
                 'to_user_id' => auth()->id(),
                 'action' => 'ForRecord',
-                'instructions' => "Changed status from '{$oldStatus}' to '{$newStatus}'".($request->remarks ? ". Note: {$request->remarks}" : ''),
+                'instructions' => "Changed status from '{$oldStatus}' to '{$newStatus}'" . ($request->remarks ? ". Note: {$request->remarks}" : ''),
                 'status' => 'Actioned', // Mark as completed log
                 'sequence' => ($correspondence->movements()->max('sequence') ?? 0) + 1,
                 'action_taken' => 'Status changed',
@@ -676,7 +678,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
 
             $errorMessage = 'Failed to update status';
             if (config('app.debug')) {
-                $errorMessage .= ': '.$e->getMessage();
+                $errorMessage .= ': ' . $e->getMessage();
             }
 
             return back()->with('error', $errorMessage);
@@ -697,7 +699,7 @@ class CorrespondenceController extends Controller implements HasMiddleware
         try {
             $latestMovement = $correspondence->movements()->latest()->first();
 
-            if (! $latestMovement) {
+            if (!$latestMovement) {
                 return back()->with('error', 'No movement found to attach comment.');
             }
 

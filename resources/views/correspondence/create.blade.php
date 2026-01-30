@@ -23,6 +23,7 @@
                             'statuses' => $statuses,
                             'divisions' => $divisions,
                             'users' => $users,
+                            'currentDivisionShortName' => $currentDivisionShortName,
                         ])
 
                         <div class="flex items-center justify-end mt-6">

@@ -81,7 +81,7 @@ class User extends Authenticatable
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $eventName) => "User has been {$eventName}");
+            ->setDescriptionForEvent(fn(string $eventName) => "User has been {$eventName}");
     }
 
     /**
@@ -90,7 +90,7 @@ class User extends Authenticatable
     public function initials(): string
     {
         return collect(explode(' ', $this->name))
-            ->map(fn ($segment) => mb_substr($segment, 0, 1))
+            ->map(fn($segment) => mb_substr($segment, 0, 1))
             ->join('');
     }
 
@@ -121,5 +121,19 @@ class User extends Authenticatable
             'roles',
             'permissions',
         ];
+    }
+    public function postings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserPosting::class);
+    }
+
+    public function currentPosting(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserPosting::class)->where('is_current', true);
+    }
+
+    public function getCurrentDivisionShortNameAttribute(): ?string
+    {
+        return $this->currentPosting?->division?->short_name;
     }
 }

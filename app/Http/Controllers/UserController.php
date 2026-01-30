@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Division;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserPosting;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -41,7 +43,7 @@ class UserController extends Controller implements HasMiddleware
             ->allowedFilters(User::getAllowedFilters())
             ->allowedSorts(User::getAllowedSorts())
             ->allowedIncludes(User::getAllowedIncludes())
-            ->with(['roles.permissions', 'permissions'])
+            ->with(['roles.permissions', 'permissions', 'currentPosting.division'])
             ->defaultSort('-created_at')
             ->paginate(request('per_page', 10))
             ->appends(request()->query());
@@ -53,8 +55,9 @@ class UserController extends Controller implements HasMiddleware
     {
         $roles = Role::all();
         $permissions = Permission::all();
+        $divisions = Division::all();
 
-        return view('users.create', compact('roles', 'permissions'));
+        return view('users.create', compact('roles', 'permissions', 'divisions'));
     }
 
     public function store(Request $request)
@@ -70,11 +73,12 @@ class UserController extends Controller implements HasMiddleware
             'roles.*' => 'exists:roles,id',
             'permissions' => 'array',
             'permissions.*' => 'exists:permissions,id',
+            'division_id' => 'required|exists:divisions,id',
         ]);
 
         // Security: Only super-admins can create other super-admins
         $isSuperAdmin = $request->is_super_admin;
-        if ($isSuperAdmin === 'Yes' && ! (auth()->user()->is_super_admin === 'Yes' || auth()->user()->hasRole('super-admin'))) {
+        if ($isSuperAdmin === 'Yes' && !(auth()->user()->is_super_admin === 'Yes' || auth()->user()->hasRole('super-admin'))) {
             $isSuperAdmin = 'No';
         }
 
@@ -87,6 +91,17 @@ class UserController extends Controller implements HasMiddleware
                 'is_super_admin' => $isSuperAdmin,
                 'is_active' => $request->is_active,
             ]);
+
+            // Create initial posting
+            if ($request->filled('division_id')) {
+                UserPosting::create([
+                    'user_id' => $user->id,
+                    'division_id' => $request->division_id,
+                    'designation' => $request->designation,
+                    'start_date' => now(),
+                    'is_current' => true,
+                ]);
+            }
 
             // Assign roles if provided (convert IDs to names for spatie/permission)
             if ($request->filled('roles')) {
@@ -111,8 +126,9 @@ class UserController extends Controller implements HasMiddleware
         $userRoles = $user->roles->pluck('id')->toArray();
         $userPermissions = $user->permissions->pluck('id')->toArray();
         $inheritedPermissions = $user->getPermissionsViaRoles()->pluck('id')->toArray();
+        $divisions = Division::all();
 
-        return view('users.edit', compact('user', 'roles', 'permissions', 'userRoles', 'userPermissions', 'inheritedPermissions'));
+        return view('users.edit', compact('user', 'roles', 'permissions', 'userRoles', 'userPermissions', 'inheritedPermissions', 'divisions'));
     }
 
     public function update(Request $request, User $user)
@@ -126,7 +142,7 @@ class UserController extends Controller implements HasMiddleware
         if ($user->hasRole('super-admin')) {
             $submittedRoleIds = $request->input('roles', []);
             $superAdminRole = Role::where('name', 'super-admin')->first();
-            if ($superAdminRole && (! in_array($superAdminRole->id, $submittedRoleIds))) {
+            if ($superAdminRole && (!in_array($superAdminRole->id, $submittedRoleIds))) {
                 return redirect()->back()->withErrors(['roles' => 'You cannot remove the super-admin role from a super-admin user.']);
             }
         }
@@ -134,7 +150,7 @@ class UserController extends Controller implements HasMiddleware
         $request->validate([
             'name' => 'required|string|max:255',
             'designation' => 'nullable|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
             'is_super_admin' => 'required|in:Yes,No',
             'is_active' => 'required|in:Yes,No',
@@ -142,11 +158,12 @@ class UserController extends Controller implements HasMiddleware
             'roles.*' => 'exists:roles,id',
             'permissions' => 'array',
             'permissions.*' => 'exists:permissions,id',
+            'division_id' => 'nullable|exists:divisions,id',
         ]);
 
         // Security: Only super-admins can change super-admin status
         $isSuperAdmin = $request->is_super_admin;
-        if ($isSuperAdmin !== $user->is_super_admin && ! (auth()->user()->is_super_admin === 'Yes' || auth()->user()->hasRole('super-admin'))) {
+        if ($isSuperAdmin !== $user->is_super_admin && !(auth()->user()->is_super_admin === 'Yes' || auth()->user()->hasRole('super-admin'))) {
             $isSuperAdmin = $user->is_super_admin;
         }
 
@@ -182,6 +199,27 @@ class UserController extends Controller implements HasMiddleware
                 $user->syncPermissions($permissionNames);
             } else {
                 $user->syncPermissions([]);
+            }
+
+            // Update Posting if Division changed
+            if ($request->filled('division_id')) {
+                $currentPosting = $user->currentPosting;
+                if (!$currentPosting || $currentPosting->division_id !== $request->division_id) {
+                    if ($currentPosting) {
+                        $currentPosting->update([
+                            'is_current' => false,
+                            'end_date' => now(),
+                        ]);
+                    }
+
+                    UserPosting::create([
+                        'user_id' => $user->id,
+                        'division_id' => $request->division_id,
+                        'designation' => $request->designation,
+                        'start_date' => now(),
+                        'is_current' => true,
+                    ]);
+                }
             }
         });
 

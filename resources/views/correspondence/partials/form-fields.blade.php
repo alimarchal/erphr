@@ -14,16 +14,59 @@
         @if($isReceipt)
             <div>
                 <x-label for="receipt_no" value="Receipt No." :required="true" />
-                <x-input id="receipt_no" type="text" name="receipt_no" class="mt-1 block w-full"
-                    :value="old('receipt_no', $correspondence?->receipt_no)" required
-                    placeholder="Enter Receipt Number" />
+                @if(isset($correspondence))
+                    @php
+                        $parts = explode('/', $correspondence->receipt_no);
+                        $serial = end($parts);
+                        // Reconstruct prefix without use of array_pop to avoid side-effects if needed, or just slice
+                        $prefix = substr($correspondence->receipt_no, 0, strrpos($correspondence->receipt_no, '/') + 1);
+                    @endphp
+                    <div class="flex mt-1">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            {{ $prefix }}
+                        </span>
+                        <input type="text" id="serial_no_input" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+                            placeholder="####" maxlength="4" required value="{{ $serial }}">
+                        <input type="hidden" name="receipt_no" id="receipt_no" value="{{ $correspondence->receipt_no }}">
+                    </div>
+                @else
+                    <div class="flex mt-1">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            BAJK/HO/{{ $currentDivisionShortName }}/{{ now()->year }}/
+                        </span>
+                        <input type="text" id="serial_no_input" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+                            placeholder="####" maxlength="4" required>
+                        <input type="hidden" name="receipt_no" id="receipt_no">
+                    </div>
+                @endif
             </div>
         @else
             <div>
                 <x-label for="dispatch_no" value="Dispatch No." :required="true" />
-                <x-input id="dispatch_no" type="text" name="dispatch_no" class="mt-1 block w-full"
-                    :value="old('dispatch_no', $correspondence?->dispatch_no)" required
-                    placeholder="Enter Dispatch Number" />
+                @if(isset($correspondence))
+                    @php
+                        $parts = explode('/', $correspondence->dispatch_no);
+                        $serial = end($parts);
+                        $prefix = substr($correspondence->dispatch_no, 0, strrpos($correspondence->dispatch_no, '/') + 1);
+                    @endphp
+                    <div class="flex mt-1">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            {{ $prefix }}
+                        </span>
+                        <input type="text" id="serial_no_input" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+                            placeholder="####" maxlength="4" required value="{{ $serial }}">
+                        <input type="hidden" name="dispatch_no" id="dispatch_no" value="{{ $correspondence->dispatch_no }}">
+                    </div>
+                @else
+                    <div class="flex mt-1">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            BAJK/HO/{{ $currentDivisionShortName }}/{{ now()->year }}/
+                        </span>
+                        <input type="text" id="serial_no_input" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+                            placeholder="####" maxlength="4" required>
+                        <input type="hidden" name="dispatch_no" id="dispatch_no">
+                    </div>
+                @endif
             </div>
         @endif
 
@@ -441,6 +484,29 @@ document.addEventListener('DOMContentLoaded', function() {
         // Select2 specific event listener
         if (typeof $ !== 'undefined') {
             $(senderDesignationSelect).on('change.select2', toggleSenderDesignationOther);
+        }
+    }
+
+    // Auto-generate number logic
+    const serialInput = document.getElementById('serial_no_input');
+    const hiddenInput = document.getElementById('{{ $isReceipt ? "receipt_no" : "dispatch_no" }}');
+    
+    if (serialInput && hiddenInput) {
+        // Get the prefix from the span immediately preceding the input
+        const prefixSpan = serialInput.previousElementSibling;
+        const prefix = prefixSpan ? prefixSpan.innerText.trim() : 'BAJK/HO/{{ $currentDivisionShortName }}/{{ now()->year }}/';
+
+        serialInput.addEventListener('input', function() {
+            // Enforce max 4 digits? User preference was 4 digits but we can leave it flexible or enforce
+            // this.value = this.value.replace(/\D/g, '').substring(0, 4); 
+            hiddenInput.value = prefix + this.value;
+        });
+
+        // Initialize only if empty (create mode) or if we want to enforce it on load
+        // For edit mode, the hidden input already has the full value, 
+        // and serial input has its part. We just need to ensure future edits update the hidden input.
+        if (!hiddenInput.value) {
+             hiddenInput.value = prefix;
         }
     }
 });
