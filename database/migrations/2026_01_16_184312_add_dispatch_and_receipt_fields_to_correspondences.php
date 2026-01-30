@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,7 +16,7 @@ return new class extends Migration
             $table->string('signed_by', 255)->nullable()->after('sending_address')->comment('Person who signed the dispatch');
 
             // Receipt-specific fields
-            $table->string('sender_designation', 255)->nullable()->comment('Designation of sender for receipt')->after('sender_designation_other');
+            $table->string('sender_designation', 255)->nullable()->comment('Designation of sender for receipt')->after('signed_by');
 
             $table->string('sender_designation_other', 255)->nullable()->after('sender_designation')->comment('Custom designation if "Another" is selected');
         });
